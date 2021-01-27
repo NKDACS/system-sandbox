@@ -3,12 +3,12 @@
 {% load static %}
 {% block title %}登出{% endblock title %}
 {% block content %}
-<p>已登出，还有<span id="sp">3</span>秒跳转到首页...</p>
+<p>已登出，还有<span id="sp">2</span>秒跳转到首页...</p>
 <script>
     onload=function () {
         setInterval(go,1000)
     };
-    var x=2;
+    var x=1;
     function go() {
 
         if (x>=0){

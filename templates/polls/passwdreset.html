@@ -10,6 +10,11 @@
     {% if form.errors %}
     <div style="color: red">邮箱输入错误</div>
     {% endif %}
+    <div class="form-group">
+        {{ form.captcha.errors }}
+        {{ form.captcha.label_tag }}
+        {{ form.captcha }}
+    </div>
 </div>
  
 {% csrf_token %}

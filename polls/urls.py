@@ -1,5 +1,5 @@
+from polls.forms import MyPasswordResetForm
 from django.urls.base import reverse_lazy
-from polls.forms import CustomPasswordResetForm
 from django.conf.urls import url
 from django.contrib.auth import logout
 from django.urls import path
@@ -12,12 +12,12 @@ urlpatterns = [
     path('userlist', views.StudentListView.as_view(), name='userlist'),
     path('login', LoginView.as_view(template_name='polls/login.html'), name='login'),
     path('logout', LogoutView.as_view(template_name='polls/logout.html'), name='logout'),
-    path('register', views.RegisterView.as_view(), name='register'),
+    url(r'^register/', views.register, name='register'),
     #密码重置链接
     url(
         r'^password_reset/$', 
         PasswordResetView.as_view(
-            # form_class=CustomPasswordResetForm,
+            form_class=MyPasswordResetForm,
             template_name = 'polls/passwdreset.html',
             email_template_name = 'polls/password_reset_email.html',
             success_url = reverse_lazy('password_reset_done')

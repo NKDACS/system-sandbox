@@ -3,5 +3,20 @@
 {% load static %}
 {% block title %}登出{% endblock title %}
 {% block content %}
-登出了
+<p>已登出，还有<span id="sp">3</span>秒跳转到首页...</p>
+<script>
+    onload=function () {
+        setInterval(go,1000)
+    };
+    var x=2;
+    function go() {
+
+        if (x>=0){
+            document.getElementById("sp").innerText=x;
+        }else {
+            location.href="{% url 'index' %}";
+        }
+        x--;
+    }
+</script>
 {% endblock content %}

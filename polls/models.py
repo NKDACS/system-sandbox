@@ -2,11 +2,15 @@ from system.settings import AUTH_USER_MODEL
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinLengthValidator
+from django.urls import reverse
 
 class MyUser(AbstractUser):
-    number = models.IntegerField(verbose_name='工号/学号', blank=True, null=True)
-    phone = models.CharField(verbose_name='电话', unique=True, blank=True, max_length=11, 
+    number = models.IntegerField(verbose_name='工号/学号', name='number', blank=True, null=True)
+    phone = models.CharField(verbose_name='电话', name='phone', blank=True, max_length=11, 
         validators=[MinLengthValidator(11, '请输入11位有效电话')])
+    
+    def get_absolute_url(self):
+        return reverse('login')
 
 UNIVERSITY = [
     ('天津',

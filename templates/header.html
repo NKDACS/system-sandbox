@@ -17,6 +17,11 @@
                     <a class="nav-link" href="{% url 'index' %}">首页</a>
                 </li>
                 {% if request.user.is_authenticated %}
+                {% if request.user.is_staff %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin">管理</a>
+                </li>
+                {% endif %}
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'logout' %}">登出</a>
                 </li>
@@ -24,10 +29,15 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'login' %}">登录</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'register' %}">注册</a>
+                </li>
                 {% endif %}
+                {% if request.user.is_authenticated %}
                 <li class="nav-item">
                     <a class="nav-link disabled" href="#">{{ request.user }}</a>
                 </li>
+                {% endif %}
             </ul>
         </div>
 

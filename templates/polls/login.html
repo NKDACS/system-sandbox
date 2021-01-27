@@ -3,6 +3,21 @@
 {% load static %}
 {% block title %}登录{% endblock title %}
 {% block content %}
+
+{% if form.errors %}
+<div class="alert alert-warning" role="alert">
+  用户名或密码错误，请注意大小写
+</div>
+{% endif %}
+
+{% if next %}
+    {% if user.is_authenticated %}
+    <p>您的账号没有访问该页面权限</p>
+    {% else %}
+    <p>该页面需要您登录账号才能访问</p>
+    {% endif %}
+{% endif %}
+
 <form method="post" action="{% url 'login' %}">
 {% csrf_token %}
 <table>
@@ -19,4 +34,8 @@
 <input type="submit" value="login">
 <input type="hidden" name="next" value="{{ next }}">
 </form>
+
+{# Assumes you setup the password_reset view in your URLconf #}
+<p><a href="{% url 'password_reset' %}">忘记密码？</a></p>
+<p><a href="{% url 'register' %}">注册</a></p>
 {% endblock content %}

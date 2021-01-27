@@ -127,3 +127,11 @@ STATICFILES_DIRS = (
 
 AUTH_USER_MODEL = 'polls.MyUser'
 LOGIN_REDIRECT_URL = '/'
+
+# Email Configuration
+EMAIL_USE_SSL = True
+EMAIL_HOST = 'smtp.126.com'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = 'alex_haoge@126.com'
+EMAIL_HOST_PASSWORD = ''
+DEFAULT_FROM_EMAIL = 'alex_haoge@126.com'

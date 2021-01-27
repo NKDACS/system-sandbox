@@ -1,0 +1,20 @@
+<!-- extends表明此页面继承自 base.html 文件 -->
+{% extends "base.html" %}
+{% load static %}
+{% block title %}重置密码{% endblock title %}
+{% block content %}
+<form method="post" class="form-validate" action="{% url 'password_reset' %}">
+<div class="form-group">
+    <label for="login-username" class="label-material">邮箱</label>
+    <input id="login-username" type="text" name="email" required data-msg="请输入您的邮箱" class="input-material">
+    {% if form.errors %}
+    <div style="color: red">邮箱输入错误</div>
+    {% endif %}
+</div>
+ 
+{% csrf_token %}
+<button type="submit" id="reset" href="#" rel="external nofollow" class="btn btn-primary">发送确认邮件</button>
+<!-- This should be submit button but I replaced it with <a> for demo purposes-->
+</form>
+{% endblock content %}
+

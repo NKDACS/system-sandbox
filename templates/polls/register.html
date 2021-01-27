@@ -1,0 +1,14 @@
+<!-- extends表明此页面继承自 base.html 文件 -->
+{% extends "base.html" %}
+{% load static %}
+{% block title %}登录{% endblock title %}
+{% block content %}
+<form method="post" id='signup'>{% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Save">
+</form>
+<script>
+//console.log(document.getElementById("signup"))
+</script>
+{% endblock content %}
+

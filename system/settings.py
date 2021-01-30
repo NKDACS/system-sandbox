@@ -103,6 +103,30 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+LOGGING = {
+    # 规定只能这样写
+    'version': 1,
+    # True表示禁用loggers
+    'disable_existing_loggers': False,
+    # 指定文件写入的格式——这里写了两个不同的格式，方便在后面不同情况需要的时候使用
+    'formatters': {
+        'default': {
+            'format': '%(levelno)s %(funcName)s %(asctime)s %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(module)s %(asctime)s %(message)s'
+        }
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/

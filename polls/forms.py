@@ -33,3 +33,27 @@ class RegisterForm(forms.Form):
 
 class MyPasswordResetForm(PasswordResetForm):
     captcha = CaptchaField(label='验证码')
+
+
+class UserProfileForm(forms.Form):
+    username = forms.CharField(
+        label="用户名", max_length=128, required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control'}))
+    password1 = forms.CharField(
+        label="密码", max_length=256, required=False,
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    password2 = forms.CharField(
+        label="确认密码", max_length=256, required=False,
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    email = forms.EmailField(
+        label="邮箱地址", required=False,
+        widget=forms.EmailInput(attrs={'class': 'form-control'}))
+    number = forms.IntegerField(
+        label="学号/工号(选填)", required=False,
+        widget=forms.NumberInput(attrs={'class': 'form-control'})
+    )
+    phone = forms.CharField(
+        label='电话', min_length=11, max_length=11, required=False,
+        validators=[MinLengthValidator(11, '请输入11位电话号')],
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )

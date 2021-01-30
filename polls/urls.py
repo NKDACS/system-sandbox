@@ -11,6 +11,7 @@ urlpatterns = [
     path('logout', LogoutView.as_view(template_name='polls/logout.html'), name='logout'),
     path('userlist', views.StudentListView.as_view(), name='userlist'),
     url(r'^register/$', views.register, name='register'),
+    url(r'^editprofile/$', views.edit_profile_view, name='editprofile'),
     #密码重置链接
     url(
         r'^password_reset/$', 

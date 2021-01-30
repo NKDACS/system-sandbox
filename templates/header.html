@@ -19,10 +19,15 @@
                     <a class="nav-link" href="{% url 'index' %}">首页</a>
                 </li>
                 {% if request.user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'editprofile' %}">编辑</a>
+                </li>
                 {% if request.user.is_staff %}
                 <li class="nav-item">
                     <a class="nav-link" href="/admin">管理</a>
                 </li>
+                {% else %}
+                
                 {% endif %}
                 {% if request.user.is_superuser %}
                 <li class="nav-item">

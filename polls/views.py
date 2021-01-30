@@ -37,6 +37,7 @@ class StudentListView(ListView):
 
 
 def register(request):
+    template_path = 'polls/register.html'
     if request.user.is_authenticated:
         # 登录状态不允许注册
         return redirect(reverse('index'))
@@ -52,19 +53,19 @@ def register(request):
             person_id = register_form.cleaned_data['person_id']
             if password1 != password2:  # 判断两次密码是否相同
                 message = "两次输入的密码不同！"
-                return render(request, 'polls/register.html', locals())
+                return render(request, template_path, locals())
             same_name_user = User.objects.filter(username=username)
             if same_name_user:  # 用户名唯一
                 message = '用户已经存在，请重新选择用户名！'
-                return render(request, 'polls/register.html', locals())
+                return render(request, template_path, locals())
             same_email_user = User.objects.filter(email=email)
             if same_email_user:  # 邮箱地址唯一
                 message = '该邮箱地址已被注册，请使用别的邮箱！'
-                return render(request, 'polls/register.html', locals())
+                return render(request, template_path, locals())
             same_id_user = User.objects.filter(person_id=person_id)
             if same_id_user:  # 邮箱地址唯一
                 message = '该身份证号已被注册，如非本人操作请联系管理员！'
-                return render(request, 'polls/register.html', locals())
+                return render(request, template_path, locals())
             # 当一切都OK的情况下，创建新用户
             user = User.objects.create_user(
                 username=username,
@@ -79,8 +80,39 @@ def register(request):
             user.set_password(password1)
             user.save()
             return redirect(reverse('login'))  # 自动跳转到登录页面
-    return render(request, 'polls/register.html', locals())
+    return render(request, template_path, locals())
 
 
-def edit_resume(request):
+def edit_profile_view(request):
+    template_path = 'polls/editprofile.html'
+    if not request.user.is_authenticated:
+        return redirect(reverse('login'))
+    profile_form = forms.UserProfileForm()
+    if request.method == "POST":
+        profile_form = forms.UserProfileForm(request.POST)
+        message = "更新失败，输入不符合要求："
+        if profile_form.is_valid():  # 获取数据
+            username = profile_form.cleaned_data['username']
+            password1 = profile_form.cleaned_data['password1']
+            password2 = profile_form.cleaned_data['password2']
+            email = profile_form.cleaned_data['email']
+            logger.info(profile_form.cleaned_data)
+            user = User.objects.filter(id=request.user.id).first()
+            if ((password1 is None) ^ (password2 is None)) or password1 != password2:
+                message += "两次输入的密码不同！"
+                return render(request, template_path, locals())
+            same_name_user = User.objects.filter(username=username).exclude(id=request.user.id)
+            if same_name_user:  # 用户名唯一
+                message += '用户已经存在，请重新选择用户名！'
+                return render(request, template_path, locals())
+            if email != '':
+                same_email_user = User.objects.filter(email=email).exclude(id=request.user.id)
+                if same_email_user:  # 邮箱地址唯一
+                    message += '该邮箱地址已被注册！'
+                    return render(request, template_path, locals())
+            message = '修改成功'
+            
+    return render(request, template_path, locals())
+
+def edit_resume_view(request):
     pass

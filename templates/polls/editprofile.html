@@ -7,7 +7,7 @@
     <div class="col-md-4 col-md-offset-4">
         <form class='form-profile' action="{% url 'editprofile' %}" method="post">
             {% if message %}
-            <div class="alert alert-warning">{{ message }}</div>
+            {% comment %} <div class="alert alert-warning">{{ message }}</div> {% endcomment %}
             {% endif %}
             {% csrf_token %}
             <h3 class="text-center">用户信息</h3>
@@ -15,7 +15,7 @@
                 姓名: {{request.user.last_name}}{{request.user.first_name}}
             </div>
             <div class="form-group">
-                身份证号： {{request.user.person_id}}
+                身份证号：{{request.user.person_id}}
             </div>
             <div class="form-group">
                 {{ profile_form.username.label_tag }}
@@ -48,5 +48,19 @@
         </form>
     </div>
 </div> <!-- /container -->
+<script>
+onload=function () {
+    message = '{{message}}'
+    console.log(message)
+    toastr.options.positionClass = 'toast-top-center';
+    if (message != '') {
+        if (message.indexOf('成功') != -1) {
+            toastr.success(message)
+        } else {
+            toastr.warning(message)
+        }
+    }
+};
+</script>
 {% endblock content %}
 

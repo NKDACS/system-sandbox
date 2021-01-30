@@ -87,7 +87,17 @@ def edit_profile_view(request):
     template_path = 'polls/editprofile.html'
     if not request.user.is_authenticated:
         return redirect(reverse('login'))
-    profile_form = forms.UserProfileForm()
+    user = User.objects.filter(id=request.user.id).first()
+    logger.debug(user.__dict__)
+    profile_form = forms.UserProfileForm(
+        initial={
+            'username': user.username,
+            'email': user.email,
+            'phone': user.phone,
+            'number': user.number,
+        }
+    )
+    profile_form
     if request.method == "POST":
         profile_form = forms.UserProfileForm(request.POST)
         message = "更新失败，输入不符合要求："
@@ -96,23 +106,38 @@ def edit_profile_view(request):
             password1 = profile_form.cleaned_data['password1']
             password2 = profile_form.cleaned_data['password2']
             email = profile_form.cleaned_data['email']
-            logger.info(profile_form.cleaned_data)
-            user = User.objects.filter(id=request.user.id).first()
-            if ((password1 is None) ^ (password2 is None)) or password1 != password2:
-                message += "两次输入的密码不同！"
-                return render(request, template_path, locals())
-            same_name_user = User.objects.filter(username=username).exclude(id=request.user.id)
-            if same_name_user:  # 用户名唯一
-                message += '用户已经存在，请重新选择用户名！'
-                return render(request, template_path, locals())
+            logger.debug(profile_form.cleaned_data)
+            if password1 != '':
+                if ((password1 is None) ^ (password2 is None)) or password1 != password2:
+                    message += "两次输入的密码不同！"
+                    return render(request, template_path, locals())
+                else:
+                    user.set_password(password1)
+            if username is not None:
+                same_name_user = User.objects.filter(username=username).exclude(id=user.id)
+                if same_name_user:  # 用户名唯一
+                    message += '用户已经存在，请重新选择用户名！'
+                    return render(request, template_path, locals())
+                else:
+                    user.username = username
             if email != '':
-                same_email_user = User.objects.filter(email=email).exclude(id=request.user.id)
+                same_email_user = User.objects.filter(email=email).exclude(id=user.id)
                 if same_email_user:  # 邮箱地址唯一
                     message += '该邮箱地址已被注册！'
                     return render(request, template_path, locals())
-            message = '修改成功'
-            
+                else:
+                    user.email = email
+            if profile_form.cleaned_data['number'] != '':
+                user.number = profile_form.cleaned_data['number']
+            if profile_form.cleaned_data['phone'] != '':
+                user.phone = profile_form.cleaned_data['phone']
+            try:
+                user.save()
+                message = '修改成功'
+            except:
+                message = '修改失败'
     return render(request, template_path, locals())
+
 
 def edit_resume_view(request):
     pass

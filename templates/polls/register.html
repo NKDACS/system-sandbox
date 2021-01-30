@@ -62,5 +62,14 @@
         </form>
     </div>
 </div> <!-- /container -->
+<script>
+onload=function () {
+    message = '{{message}}'
+    console.log(message)
+    if (message != '') {
+        toastr.warning(message)
+    }
+};
+</script>
 {% endblock content %}
 

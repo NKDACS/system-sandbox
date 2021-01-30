@@ -5,10 +5,9 @@
 {% block content %}
 <div class="jumbotron">
     <h1 class="display-4">{{content1}}</h1>
-    <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to
-        featured content or information.</p>
+    <p class="lead">{{content2}}.</p>
     <hr class="my-4">
-    <p>Hello world</p>
-    <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
+    <p>{{content3}}</p>
+    <a class="btn btn-primary btn-lg" href="{% url 'userlist' %}" role="button">Learn more</a>
 </div>
 {% endblock content %}

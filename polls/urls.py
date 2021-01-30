@@ -1,6 +1,5 @@
 from django.urls.base import reverse_lazy
 from django.conf.urls import url
-from django.contrib.auth import logout
 from django.urls import path
 from django.contrib.auth.views import *
 
@@ -8,9 +7,9 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('userlist', views.StudentListView.as_view(), name='userlist'),
     path('login', LoginView.as_view(template_name='polls/login.html'), name='login'),
     path('logout', LogoutView.as_view(template_name='polls/logout.html'), name='logout'),
+    path('userlist', views.StudentListView.as_view(), name='userlist'),
     url(r'^register/$', views.register, name='register'),
     #密码重置链接
     url(

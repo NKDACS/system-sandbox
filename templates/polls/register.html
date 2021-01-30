@@ -32,6 +32,21 @@
                 {{ register_form.number }}
             </div>
             <div class="form-group">
+                {{ register_form.last_name.label_tag }}
+                {{ register_form.last_name }}
+                注意！姓名一旦提交无法更改
+            </div>
+            <div class="form-group">
+                {{ register_form.first_name.label_tag }}
+                {{ register_form.first_name }}
+                注意！姓名一旦提交无法更改
+            </div>
+            <div class="form-group">
+                {{ register_form.person_id.label_tag }}
+                {{ register_form.person_id }}
+                注意！身份证号一旦提交无法更改
+            </div>
+            <div class="form-group">
                 {{ register_form.phone.label_tag }}
                 {{ register_form.phone }}
             </div>

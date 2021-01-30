@@ -6,10 +6,10 @@
 			<span class="navbar-toggler-icon"></span>
 		</button>
         <!-- 导航栏商标 -->
-        <div class="navbar-brand" style="padding:unset;">
+        <a class="navbar-brand" style="padding:unset;" href="{% url 'index' %}">
             <img src="{% static 'img/statlogo.png' %}" alt="logo" />
             统计与数据科学学院推免系统
-        </div>
+        </a>
 
         <!-- 导航入口 -->
         <div class="collapse navbar-collapse " id="navbarToggler">
@@ -22,6 +22,11 @@
                 {% if request.user.is_staff %}
                 <li class="nav-item">
                     <a class="nav-link" href="/admin">管理</a>
+                </li>
+                {% endif %}
+                {% if request.user.is_superuser %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin">后台</a>
                 </li>
                 {% endif %}
                 <li class="nav-item">
@@ -37,7 +42,9 @@
                 {% endif %}
                 {% if request.user.is_authenticated %}
                 <li class="nav-item">
-                    <a class="nav-link disabled" href="#">{{ request.user }}</a>
+                    <a class="nav-link disabled" href="#">
+                        {{ request.user.last_name}}{{request.user.first_name}}
+                    </a>
                 </li>
                 {% endif %}
             </ul>

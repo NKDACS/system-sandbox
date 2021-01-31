@@ -4,4 +4,4 @@ from .models import *
 
 admin.site.register(MyUser, UserAdmin)
 
-admin.site.register([Resume,])
+admin.site.register([Resume, Anoucement])

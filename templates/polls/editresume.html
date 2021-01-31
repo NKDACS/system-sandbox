@@ -1,0 +1,41 @@
+<!-- extends表明此页面继承自 base.html 文件 -->
+{% extends "polls/main.html" %}
+{% load static %}
+{% block title %}修改简历{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="col-md-8 col-md-offset-4">
+        <form class='form-resume' action="{% url 'editresume' %}" method="post">
+            {% csrf_token %}
+            <h4 class="text-center">
+            {{request.user.last_name|safe}}{{request.user.first_name|safe}}的简历
+            </h4>
+            {% for field in resume_form %}
+            <div class="form-group">
+                {{ field.errors }}
+                {{ field.label_tag }}
+                {{ field }}
+            </div> 
+            {% endfor %}
+            <button type="reset" class="btn btn-secondary pull-left">重置</button>
+            <button type="submit" class="btn btn-primary pull-right">保存</button>
+ 
+        </form>
+    </div>
+</div> <!-- /container -->
+<script>
+onload=function () {
+    message = '{{message}}'
+    console.log(message)
+    toastr.options.positionClass = 'toast-top-center';
+    if (message != '') {
+        if (message.indexOf('成功') != -1) {
+            toastr.success(message)
+        } else {
+            toastr.warning(message)
+        }
+    }
+};
+</script>
+{% endblock content %}
+

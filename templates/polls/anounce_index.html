@@ -1,0 +1,50 @@
+<!-- extends表明此页面继承自 base.html 文件 -->
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{anounce}}{% endblock title %}
+{% block body %}
+<div class="container" style="padding-top:3rem; padding-bottom: 5rem;">
+    <h2>公告列表</h2>
+    <ul class="list-group list-group-flush">
+    {% for anounce in page_obj %}
+        <a href="{% url 'anounce_detail' anounce.id %}" class="list-group-item list-group-item-action">
+            <div class="d-flex w-100 justify-content-between">
+                <span class="mb-1">{{ anounce.title | safe }}</span>
+                <small>{{anounce.public_time}}</small>
+            </div>
+        </a>
+    {% endfor %}
+    </ul>
+    <nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        <li class="page-item"><a class="page-link" href="?page=1">首页</a></li>
+        {% if page_obj.number > 2 %}
+        <li class="page-item"><a class="page-link" href="#">...</a></li>
+        {% endif %}
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                {{ page_obj.previous_page_number }}
+            </a>
+        </li>
+        {% endif %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.number }}">
+                {{ page_obj.number }}
+            </a>
+        </li>
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                {{ page_obj.next_page_number }}
+            </a>
+        </li>
+        {% endif %}
+        {% if page_obj.number < page_obj.paginator.num_pages %}
+        <li class="page-item"><a class="page-link" href="#">...</a></li>
+        {% endif %}
+        <li class="page-item"><a class="page-link" href="?page=page_obj.paginator.num_pages">尾页</a></li>
+    </ul>
+    </nav>
+</div>
+{% endblock body %}

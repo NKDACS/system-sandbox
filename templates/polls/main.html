@@ -2,25 +2,18 @@
 {% extends "base.html" %}
 {% load static %}
 {% block title %}首页{% endblock title %}
-{% block content %}
-<div class="jumbotron">
-    <div class="container">
-    <h1 class="display-4">{{content1}}</h1>
-    <p class="lead">{{content2}}</p>
-    <hr class="my-4">
-    <p>{{content3}}</p>
-    <a class="btn btn-primary btn-lg" href="{% url 'editresume' %}" role="button">我要报名</a>
+{% block body %}
+<div class="container" style="padding-top:3rem; padding-bottom: 5rem;">
+    <div class="row">
+    <div class="col-md-8">
+        {% block content %}{% endblock content %}
     </div>
-</div>
-<div class="container">
-<div class="row">
     <div class="col-md-4">
-        <h5>通知公告</h5>
         <ul class="list-group list-group-flush anounce_list"></ul>
         <div class="row d-flex flex-row-reverse">
         <a href="{% url 'anounce_index' %}" class="d-inline-flex p-2 ">查看更多</a>
         </div>
     </div>
+    </div>
 </div>
-</div>
-{% endblock content %}
+{% endblock body %}

@@ -16,9 +16,16 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path, include
+from django.views.static import serve
+from .settings import MEDIA_ROOT, STATIC_ROOT
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('polls.urls')),
     url(r'^captcha', include('captcha.urls')),
+    path('summernote/', include('django_summernote.urls')),
+    # 用于上传图片文件，也可以上传其他文件word,ppt等。
+    path('media/<path:path>', serve, {'document_root': MEDIA_ROOT}),
+    # 用于加载静态文件
+    path('static/<path:path>', serve, {'document_root': STATIC_ROOT}),  
 ]

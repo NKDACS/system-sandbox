@@ -15,12 +15,29 @@
     <!-- 引入导航栏 -->
     {% include 'header.html' %}
     <!-- 预留具体页面的位置 -->
+    {% block body %}
     {% block content %}{% endblock content %}
+    {% endblock body %}
     <!-- 引入注脚 -->
     {% include 'footer.html' %}
     <script src="{% static 'jquery.min.js' %}"></script>
     <script src="{% static 'popper.js' %}"></script>
     <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
     <script src="{% static 'toastr/toastr.min.js' %}"></script>
+    <script>
+        $(document).ready(function(){
+            $.get("{% url 'anounce_list' 5 %}", {}, function(resp){
+                for(var k=0;k<resp['list'].length;k++){
+                    i = resp['list'][k]
+                    console.log(i)
+                    j = '<a href="/anounce/' + i['id'] + '/" class="list-group-item list-group-item-action"'
+                        + ' style="padding: 0.5rem;">'
+                        + '<div class="d-flex w-100 justify-content-between"><span class="mb-1">'
+                        + i['title'] + '</span> <small>' + i['public_time'] + '</small></div></a>'
+                    $(".anounce_list").append(j)
+                }
+            })
+        })
+    </script>
 </body>
 </html>

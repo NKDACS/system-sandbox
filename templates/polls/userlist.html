@@ -2,11 +2,11 @@
 {% extends "base.html" %}
 {% load static %}
 {% block title %}用户列表{% endblock title %}
-{% block content %}
+{% block body %}
 {% for item in user_list %}
 
 <ul class="list-group">
     <li class="list-group-item">{{ item }}</li>
 </ul>
 {% endfor %}
-{% endblock content %}
+{% endblock body %}

@@ -1,9 +1,12 @@
 import logging
 from django.urls.base import reverse
 from django.shortcuts import redirect, render
+from django.http import JsonResponse
 from django.views.generic import ListView
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
+from django.utils import timezone
+from django.core.serializers import serialize
 from .models import *
 from . import forms
 
@@ -15,7 +18,7 @@ def index(request):
     context = {
         'content1': '研究生推免报名系统',
         'content2': '南开大学统计与数据科学学院',
-        'content3': '测试一下'
+        'content3': '允公允能，日新月异'
     }
     return render(request, 'polls/index.html', context)
 
@@ -87,17 +90,9 @@ def edit_profile_view(request):
     template_path = 'polls/editprofile.html'
     if not request.user.is_authenticated:
         return redirect(reverse('login'))
-    user = User.objects.filter(id=request.user.id).first()
+    user = User.objects.get(id=request.user.id)
     logger.debug(user.__dict__)
-    profile_form = forms.UserProfileForm(
-        initial={
-            'username': user.username,
-            'email': user.email,
-            'phone': user.phone,
-            'number': user.number,
-        }
-    )
-    profile_form
+    profile_form = forms.UserProfileForm(initial=user.__dict__)
     if request.method == "POST":
         profile_form = forms.UserProfileForm(request.POST)
         message = "更新失败，输入不符合要求："
@@ -107,8 +102,8 @@ def edit_profile_view(request):
             password2 = profile_form.cleaned_data['password2']
             email = profile_form.cleaned_data['email']
             logger.debug(profile_form.cleaned_data)
-            if password1 != '':
-                if ((password1 is None) ^ (password2 is None)) or password1 != password2:
+            if password1 != '' or password2 != '':
+                if password1 == '' or password2 == '' or password1 != password2:
                     message += "两次输入的密码不同！"
                     return render(request, template_path, locals())
                 else:
@@ -140,4 +135,64 @@ def edit_profile_view(request):
 
 
 def edit_resume_view(request):
-    pass
+    template_path = 'polls/editresume.html'
+    if not request.user.is_authenticated:
+        return redirect(reverse('login'))
+    user = User.objects.get(id=request.user.id)
+    resume = Resume.objects.get_or_create(student=user, defaults={'student':user})[0]
+    logger.info(resume.__dict__)
+    resume_form = forms.ResumeForm(instance=resume)
+    if request.method == "POST":
+        resume_form = forms.ResumeForm(request.POST, instance=resume)
+        message = "更新失败，输入不符合要求："
+        if resume_form.is_valid():  # 获取数据
+            logger.debug(resume_form.cleaned_data)
+            try:
+                resume_form.save()
+                message = '修改成功'
+            except:
+                message = '修改失败'
+        else:
+            message = resume_form.errors.as_text()
+    return render(request, template_path, locals())
+
+
+class AnounceListView(ListView):
+    template_name = 'polls/anounce_index.html'
+    context_object_name = 'anounce_list'
+    paginate_by = 10
+
+    def get_queryset(self):
+        return Anoucement.objects.filter(public_time__lte=timezone.now()).order_by('-public_time')
+
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect(reverse('login'))
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        n = self.get_queryset().count() // self.paginate_by + 1
+        context['num_list_left'] = list(range(1, min(4, n+1)))
+        context['num_list_right'] = list(range(max(min(4, n+1), n-2), n+1))
+        return context
+
+
+def AnounceLatestListView(request, num=-1):
+    set = Anoucement.objects.filter(
+        public_time__lte=timezone.now()).order_by('-public_time').values('id', 'title', 'public_time')
+    if num != -1:
+        set = set[:num]
+    data = {'list': []}
+    for i in set:
+        data['list'].append({
+            'id': i['id'], 'title': i['title'], 
+            'public_time': i['public_time'].strftime("%Y-%m-%d")
+        })
+    return JsonResponse(data)
+
+def AnounceDetailView(request, pk):
+    anounce = Anoucement.objects.get(id=pk)
+    if anounce.public_time > timezone.now() and not (request.user.is_authenticated and request.user.is_staff):
+        raise PermissionDenied
+    return render(request, 'polls/anounce_detail.html', locals())

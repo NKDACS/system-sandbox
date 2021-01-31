@@ -1,0 +1,16 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django-ranged-response = "*"
+django-simple-captcha = "*"
+django-summernote = "*"
+Django = "==3.1.5"
+uWSGI = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.8"

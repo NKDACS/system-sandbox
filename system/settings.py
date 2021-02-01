@@ -25,7 +25,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = secret.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
+PRODUCTION_URL_PREFIX = '/tuimian'
 
 ALLOWED_HOSTS = ['*']
 
@@ -168,3 +169,8 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+if not DEBUG:
+    STATIC_URL = PRODUCTION_URL_PREFIX + STATIC_URL
+    LOGIN_REDIRECT_URL = PRODUCTION_URL_PREFIX + LOGIN_REDIRECT_URL
+    MEDIA_URL = PRODUCTION_URL_PREFIX + MEDIA_URL

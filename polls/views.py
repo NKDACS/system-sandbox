@@ -20,6 +20,8 @@ def index(request):
         'content2': '南开大学统计与数据科学学院',
         'content3': '允公允能，日新月异'
     }
+    from django.conf import settings
+    logger.warning(settings.LOGIN_REDIRECT_URL)
     return render(request, 'polls/index.html', context)
 
 User = get_user_model()

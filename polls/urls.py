@@ -8,8 +8,16 @@ from .forms import MyPasswordResetForm
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('login', LoginView.as_view(template_name='polls/login.html'), name='login'),
-    path('logout', LogoutView.as_view(template_name='polls/logout.html'), name='logout'),
+    path('login',
+        LoginView.as_view(
+            template_name='polls/login.html',
+            redirect_authenticated_user=True
+        ), 
+        name='login'),
+    path('logout',
+        LogoutView.as_view(
+            template_name='polls/logout.html'),
+        name='logout'),
     path('userlist', views.StudentListView.as_view(), name='userlist'),
     url(r'^register/$', views.register, name='register'),
     url(r'^editprofile/$', views.edit_profile_view, name='editprofile'),

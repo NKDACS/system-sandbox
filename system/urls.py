@@ -17,9 +17,9 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path, include
 from django.views.static import serve
-from .settings import MEDIA_ROOT, STATIC_ROOT
+from .settings import MEDIA_ROOT, STATIC_ROOT, DEBUG
 
-urlpatterns = [
+extrapatterns = [
     path('admin/', admin.site.urls),
     path('', include('polls.urls')),
     url(r'^captcha', include('captcha.urls')),
@@ -29,3 +29,5 @@ urlpatterns = [
     # 用于加载静态文件
     path('static/<path:path>', serve, {'document_root': STATIC_ROOT}),  
 ]
+
+urlpatterns = extrapatterns if DEBUG else [ path('tuimian/', include(extrapatterns)) ]

@@ -21,7 +21,7 @@ def index(request):
         'content3': '允公允能，日新月异'
     }
     from django.conf import settings
-    logger.warning(settings.LOGIN_REDIRECT_URL)
+    logger.warning(settings.MEDIA_URL)
     return render(request, 'polls/index.html', context)
 
 User = get_user_model()

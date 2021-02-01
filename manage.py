@@ -14,8 +14,16 @@ def main():
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
+    print('''
+ _   _ _  ______    _    ____ ____  
+| \ | | |/ /  _ \  / \  / ___/ ___| 
+|  \| | ' /| | | |/ _ \| |   \___ \ 
+| |\  | . \| |_| / ___ \ |___ ___) |
+|_| \_|_|\_\____/_/   \_\____|____/ 
+    @ NKDACS 2021
+    Left blank here for co-authors''')
     execute_from_command_line(sys.argv)
-
+    
 
 if __name__ == '__main__':
     main()

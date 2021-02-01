@@ -1,28 +1,25 @@
 import logging
 from django.urls.base import reverse
 from django.shortcuts import redirect, render
+from django.utils.http import urlsafe_base64_decode
 from django.http import JsonResponse
 from django.views.generic import ListView
 from django.contrib.auth import get_user_model
-from django.core.exceptions import PermissionDenied
 from django.utils import timezone
-from django.core.serializers import serialize
+from django.utils.encoding import force_text
+from django.core.exceptions import PermissionDenied
 from .models import *
+from .utils import account_activation_token, send_activate_email
 from . import forms
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
 # Create your views here.
 def index(request):
-    #return HttpResponse("Hello, world. You're at the polls index.")
-    context = {
-        'content1': '研究生推免报名系统',
-        'content2': '南开大学统计与数据科学学院',
-        'content3': '允公允能，日新月异'
-    }
     from django.conf import settings
-    logger.warning(settings.MEDIA_URL)
-    return render(request, 'polls/index.html', context)
+    logger.debug(settings.MEDIA_URL)
+    return render(request, 'polls/index.html', locals())
 
 User = get_user_model()
 
@@ -43,7 +40,7 @@ class StudentListView(ListView):
 
 def register(request):
     template_path = 'polls/register.html'
-    if request.user.is_authenticated:
+    if request.user.is_authenticated and not settings.DEBUG:
         # 登录状态不允许注册
         return redirect(reverse('index'))
     register_form = forms.RegisterForm()
@@ -80,12 +77,33 @@ def register(request):
                 phone=register_form.cleaned_data['phone'],
                 first_name=register_form.cleaned_data['first_name'],
                 last_name=register_form.cleaned_data['last_name'],
-                person_id=person_id
+                person_id=person_id,
+                is_active=False # 默认未激活
             )
             user.set_password(password1)
-            user.save()
-            return redirect(reverse('login'))  # 自动跳转到登录页面
+            try:
+                send_activate_email(request, user)
+                user.save()
+                message = '注册成功，请登录注册邮箱激活账号'
+            except Exception as e:
+                logger.error(e.__traceback__())
+                message = '激活邮件发送失败，请联系管理员'
     return render(request, template_path, locals())
+
+
+def activate_account_view(request, uidb64, token):
+    template_path = 'polls/acount_verify_result.html'
+    try:
+        uid = force_text(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    if user is not None and account_activation_token.check_token(user, token):
+        user.is_active = True
+        user.save()
+        return render(request, template_path, {'message': True})
+    else:
+        return render(request, template_path, {'message': False})
 
 
 def edit_profile_view(request):

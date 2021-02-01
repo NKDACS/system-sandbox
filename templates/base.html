@@ -44,16 +44,15 @@ D                                                                              D
 DDDDDDDDDDD                                                          DDDDDDDDDDD
 DDDDDDDDDDD                                                          DDDDDDDDDDD
 
-
-    @NKDACS 2021`, 'color: #6cf'),
-console.log('%c Left blank here for co-authors', 'color: #6cf')
+    @NKDACS 2021
+    Left blank here for co-authors`, 'color: #6cf'),
             $.get("{% url 'anounce_list' 5 %}", {}, function(resp){
                 for(var k=0;k<resp['list'].length;k++){
                     i = resp['list'][k]
                     href = "{% url 'anounce_detail' '1' %}"
                     href = href.slice(0,href.length-2)
                     href += i['id']
-                    console.log(i)
+                    // console.log(i)
                     j = '<a href="' + href + '" class="list-group-item list-group-item-action"'
                         + ' style="padding: 0.5rem;">'
                         + '<div class="d-flex w-100 justify-content-between"><span class="mb-1">'

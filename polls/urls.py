@@ -23,7 +23,7 @@ urlpatterns = [
     url(r'^editprofile/$', views.edit_profile_view, name='editprofile'),
     url(r'^editresume/$', views.edit_resume_view, name='editresume'),
     path('anounce/index/', views.AnounceListView.as_view(), name='anounce_index'),
-    path('anounce/latest<int:num>/', views.AnounceLatestListView, name='anounce_list'),
+    path('anounce/latest/<int:num>/', views.AnounceLatestListView, name='anounce_list'),
     path('anounce/<int:pk>/', views.AnounceDetailView, name='anounce_detail'),
     #密码重置链接
     url(
@@ -45,12 +45,18 @@ urlpatterns = [
     ),
     #用户通过邮箱打开的重置密码页面
     url(
-        r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,40})/$', 
+        r'^reset_password/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,40})/$', 
         PasswordResetConfirmView.as_view(
             template_name='polls/password_reset_confirm.html',
             success_url = reverse_lazy('password_reset_complete')
         ),
         name='password_reset_confirm',
+    ),
+    #用户激活页面
+    url(
+        r'^activate_acount/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,40})/$',
+        views.activate_account_view,
+        name='activate_account',
     ),
     #密码重置完成后跳转的页面
     url(

@@ -43,7 +43,7 @@
         {% if page_obj.number < page_obj.paginator.num_pages %}
         <li class="page-item"><a class="page-link" href="#">...</a></li>
         {% endif %}
-        <li class="page-item"><a class="page-link" href="?page=page_obj.paginator.num_pages">尾页</a></li>
+        <li class="page-item"><a class="page-link" href="?page={{page_obj.paginator.num_pages}}">尾页</a></li>
     </ul>
     </nav>
 </div>

@@ -61,12 +61,41 @@
  
         </form>
     </div>
-</div> <!-- /container -->
+</div>
+<div class="modal fade" 
+    id="successModal" tabindex="-1" aria-labelledby="successModalLabel"
+    data-bs-backdrop="static" data-bs-keyboard="false"
+    aria-labelledby="staticBackdropLabel"
+    aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="successModalLabel">注册成功</h5>
+      </div>
+      <div class="modal-body">
+        {{message}}
+      </div>
+      <div class="modal-footer">
+        <a href="{% url 'index' %}">
+        <button type="button" class="btn btn-secondary" href>返回主页</button>
+        </a>
+        <a href="{% url 'login' %}">
+        <button type="button" class="btn btn-primary">转至登录页面</button>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+ <!-- /container -->
 <script>
 onload=function () {
     message = '{{message}}'
-    console.log(message)
     if (message != '') {
+        console.log(message)
+        if (message.indexOf('成功') != -1) {
+            toastr.success(message)
+            $("#successModal").toggle()
+        }
         toastr.warning(message)
     }
 };

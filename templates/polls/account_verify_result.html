@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}邮箱验证{% endblock title %}
+{% block body %}
+{% if message is True %}
+<h3>验证成功！</h3>
+<p>还有<span id="sp">2</span>秒跳转到<a href='{% url 'login' %}'>登录页面</a>...</p>
+{% else %}
+<h3>验证失败！</h3>
+<p>请重新注册</p>
+{% endif %}
+<script>
+    onload=function () {
+        setInterval(go,1000)
+    };
+    var x=1;
+    function go() {
+        if (x>=0){
+            document.getElementById("sp").innerText=x;
+        } else if ('{{message}}'=='True') {
+            location.href="{% url 'index' %}";
+        }
+        x--;
+    }
+</script>
+{% endblock body %}

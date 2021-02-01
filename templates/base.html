@@ -26,6 +26,27 @@
     <script src="{% static 'toastr/toastr.min.js' %}"></script>
     <script>
         $(document).ready(function(){
+            console.log(`%c
+DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
+D                                                                              D
+D                                                                              D
+D       DD      DD  DDD   DDD   DDDDDDDD    DDDDDDD    DDDDDDD    DDDDDD       D
+D       DDDD    DD  DDD  DD     DDD   DD   DDD   DD   DDD    D   DDD   D       D
+D       DDDDD   DD  DDD DD      DDD   DD   DDD   DD   DDD        DDDD          D
+D       DDDDDDD DD  DDDDD       DDD   DD   DDD   DD   DDD         DDDD         D
+D       D DDDDDDDD  DDDDD       DDD   DD   DDDDDDDD   DDD          DDDD        D
+D       D   DDDDDD  DDDDDD      DDD   DD   DDD   DD   DDD           DDDD       D
+D       D    DDDDD  DDD DDD     DDD   DD   DDD   DD   DDD            DDD       D
+D       D     DDDD  DDD  DDD    DDD  DDD   DDD   DD   DDDD   D   DD  DDD       D
+D       D       DD  DDD   DDD   DDDDDDD    DDD   DD     DDDDD     DDDDD        D
+D                                                                              D
+D                                                                              D
+DDDDDDDDDDD                                                          DDDDDDDDDDD
+DDDDDDDDDDD                                                          DDDDDDDDDDD
+
+
+    @NKDACS 2021`, 'color: #6cf'),
+console.log('%c Left blank here for co-authors', 'color: #6cf')
             $.get("{% url 'anounce_list' 5 %}", {}, function(resp){
                 for(var k=0;k<resp['list'].length;k++){
                     i = resp['list'][k]

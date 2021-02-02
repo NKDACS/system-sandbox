@@ -70,7 +70,7 @@ class ResumeForm(forms.ModelForm):
             'other_prize_penalty', 'others',
         ]
         widgets = {
-            # 'university': forms.TextInput(attrs={'class': 'form-control'}),
+            'university': forms.Select(attrs={'class': 'form-control'}),
             'school': forms.TextInput(attrs={'class': 'form-control'}),
             'major': forms.TextInput(attrs={'class': 'form-control'}),
             'gpa': forms.NumberInput(attrs={'class': 'form-control'}),

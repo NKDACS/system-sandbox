@@ -25,6 +25,10 @@
 </div> <!-- /container -->
 <script>
 onload=function () {
+    $("#id_university").chosen({
+        placeholder_text_single: '请选择您的本科院校',
+        width: "95%"
+    });
     message = '{{message}}'
     console.log(message)
     toastr.options.positionClass = 'toast-top-center';

@@ -7,6 +7,7 @@ from django.views.generic import ListView
 # from django.views.decorators.cache import cache_page
 from django.contrib.auth import get_user_model
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
@@ -251,3 +252,8 @@ def delete_anounce_view(request, pk):
         anounce.delete()
         return redirect(reverse('anounce_index'))
     return render(request, 'polls/anounce_delete.html', {'anounce': anounce})
+
+
+@login_required
+def check_submit_view(request):
+    pass

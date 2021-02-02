@@ -44,7 +44,6 @@ def IDValidator(value):
     if Ti[sum % 11] != value[17]:
         raise ValueError('请输入正确的身份证号码')
 
-
 UNIVERSITY = [
     ('天津',
         [('4112010055', '南开大学')]
@@ -58,3 +57,20 @@ UNIVERSITY = [
      )
 ]
 
+
+def check_resume(resume):
+    """
+    这里定义简历字段逻辑，用于检验
+    """
+    message = []
+    if resume.major_student_amount < resume.rank:
+        message.append((resume.major_student_amount.verbose_name, '小于个人排名'))
+    if resume.gpa > 100:
+        message.append((resume.gpa.verbose_name, '学分绩大于100'))
+    return message
+
+class GlobalVar(object):
+    from django.core.cache import cache
+    @staticmethod
+    def get():
+        pass

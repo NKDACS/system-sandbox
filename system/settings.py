@@ -189,14 +189,13 @@ CACHES = {
         },
         # 自定义键名命名规则
         # 'KEY_FUNCTION': KEY_FUNCTION,
+    },
+    'dummy': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     }
 }
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 if DEBUG:
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-        }
-    }
+    CACHE_MIDDLEWARE_ALIAS = 'dummy'
     SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 

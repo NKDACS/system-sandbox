@@ -14,10 +14,7 @@ urlpatterns = [
             redirect_authenticated_user=True
         ), 
         name='login'),
-    path('logout',
-        LogoutView.as_view(
-            template_name='polls/logout.html'),
-        name='logout'),
+    path('logout', LogoutView.as_view(template_name='polls/logout.html'),name='logout'),
     path('userlist', views.StudentListView.as_view(), name='userlist'),
     path('register/', views.register, name='register'),
     path('edit/profile/', views.edit_profile_view, name='editprofile'),

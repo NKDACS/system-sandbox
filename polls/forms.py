@@ -91,3 +91,11 @@ class AnouncementForm(forms.ModelForm):
             'content': SummernoteWidget(attrs={'class': 'form-control'}),
             'public_time': forms.DateTimeInput()
         }
+
+
+class ConfirmSubmitForm(forms.Form):
+    i_confirm = forms.BooleanField(
+        label='我已知晓以上内容，确认提交',
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        required=True, initial=False
+    )

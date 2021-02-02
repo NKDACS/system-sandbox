@@ -1,12 +1,31 @@
 <!-- extends表明此页面继承自 base.html 文件 -->
-{% extends "base.html" %}
+{% extends "base2.html" %}
 {% load static %}
 {% block title %}用户列表{% endblock title %}
 {% block body %}
-{% for item in user_list %}
-
-<ul class="list-group">
-    <li class="list-group-item">{{ item }}</li>
-</ul>
-{% endfor %}
+<div class="container", style="padding:3rem;">
+    <h3>用户列表</h3>
+    <table class="table table-striped">
+    <caption>条纹表格布局</caption>
+    <thead><tr>
+        <th>姓名</th>
+        <th>身份证号</th>
+        <th>邮箱</th>
+        <th>手机</th>
+        <th>是否已提交</th>
+        <th>备选</th></tr>
+    </thead>
+    <tbody>
+    {% for item in user_list %}
+        <tr>
+            <td>{{item.username}}</td>
+            <td>{{item.person_id}}</td>
+            <td>{{item.email}}</td>
+            <td>{{item.phone}}</td>
+            <td>{{item.submitted}}</td><td></td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+</div>
 {% endblock body %}

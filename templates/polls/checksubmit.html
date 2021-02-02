@@ -1,0 +1,64 @@
+<!-- extends表明此页面继承自 base.html 文件 -->
+{% extends "polls/main.html" %}
+{% load static %}
+{% block title %}修改简历{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row">
+    <div class="col-md-8 col-md-offset-4">
+        {% if check_pass %}
+        <h3>提交简历确认</h3>
+        <p>您的简历已<strong>通过校验</strong>，可以提交<br/>
+        在提交前请您仔细阅读以下<strong>说明</strong>：</p>
+        <p>您的姓名： {{request.user.last_name|safe}}{{request.user.first_name|safe}} </p>
+        <p>您的身份证号： {{request.user.person_id}} </p>
+        这里可以写一些说明
+        <form class='form-confirm' action="{% url 'check_and_submit' %}" method="post">
+            {% csrf_token %}
+            {% if is_submitted %}
+            <button type="button" class="btn btn-primary pull-right" disabled>已提交</button>
+            <strong>您已提交，如需修改请联系管理员</strong>
+            {% else %}
+            <div class="form-check">
+                {{ confirm_form.i_confirm }}
+                <label class="form-check-label" for="{{ confirm_form.i_confirm.id_for_label }}">
+                    {{ confirm_form.i_confirm.label }}
+                </label>                
+            </div>
+            <button type="submit" class="btn btn-primary pull-right">提交简历</button>
+                <a href="{% url 'editresume' %}">
+                <button type="button" class="btn btn-secondary">返回修改</button>
+                </a>
+            {% endif %}
+        </form>
+        {% else %}
+        <h3>未通过校验</h3>
+        <p>您的简历<strong>未通过校验</strong>，以下信息存在问题：</p>
+        {% for e in errors %}
+            <p>{{e.name}}： {{e.msg}}</p>
+        {% endfor %}
+        <a href="{% url 'editresume' %}">
+        <button type="button" class="btn btn-primary">返回修改</button>
+        </a>
+        {% endif %}
+    </div>
+    </div>
+</div>
+<script>
+onload=function () {
+    message = '{{message}}'
+    console.log(message)
+    toastr.options.positionClass = 'toast-top-center';
+    if (message != '') {
+        if (message.indexOf('通过') != -1) {
+            toastr.info(message)
+        } else if (message.indexOf('成功') != -1) {
+            toastr.success(message)
+        }else {
+            toastr.warning(message)
+        }
+    }
+};
+</script>
+{% endblock content %}
+

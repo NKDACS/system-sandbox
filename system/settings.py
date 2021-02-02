@@ -186,6 +186,7 @@ CACHES = {
         'OPTIONS': {
             "CLIENT_CLASS": 'django_redis.client.DefaultClient',
             'PASSWORD': secret.REDIS_PASSWORD,
+            "IGNORE_EXCEPTIONS": True,
         },
         # 自定义键名命名规则
         # 'KEY_FUNCTION': KEY_FUNCTION,

@@ -4,6 +4,7 @@
 {% block title %}修改简历{% endblock %}
 {% block content %}
 <div class="container">
+    <div class="row">
     <div class="col-md-8 col-md-offset-4">
         <form class='form-resume' action="{% url 'editresume' %}" method="post">
             {% csrf_token %}
@@ -19,8 +20,16 @@
             {% endfor %}
             <button type="reset" class="btn btn-secondary pull-left">重置</button>
             <button type="submit" class="btn btn-primary pull-right">保存</button>
- 
+            您随时可以保存
         </form>
+    </div>
+    <div class="col-md-4">
+        <a href="{% url 'check_and_submit' %}">
+        <button type="button" class="btn btn-outline-info align-middle">
+            智能校验<br/>提交简历
+        </button>
+        </a>
+    </div>
     </div>
 </div> <!-- /container -->
 <script>

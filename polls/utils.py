@@ -5,6 +5,7 @@ from django.conf import settings
 from django.utils.encoding import force_bytes
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
+from django.contrib.staticfiles import finders
 
 
 class TokenGenerator(PasswordResetTokenGenerator):
@@ -44,44 +45,55 @@ def IDValidator(value):
     if Ti[sum % 11] != value[17]:
         raise ValueError('请输入正确的身份证号码')
 
-UNIVERSITY = [
-    ('天津',
-        [('4112010055', '南开大学')]
-    ),
-    ('北京',
-        [
-            ('4111010003', '清华大学'),
-            ('4111010001', '北京大学'),
-            ('4111010007', '北京理工大学')
-        ]
-     )
-]
+
+class GlobalVar(object):
+    from django.core.cache import cache
+
+    @staticmethod
+    def get():
+        pass
+
+
+def get_university():
+    result = finders.find('ChinaUniversityList.json')
+    from json import load
+    file = open(result, 'r', encoding='utf-8')
+    d = load(file)
+    school = []
+    for i in d:
+        local_school = [(j['code'], j['name']) for j in i['schools']]
+        school.append((i['province'], local_school))
+    return school
+
+UNIVERSITY = get_university()
 
 
 def check_resume(resume):
     """
     这里定义简历字段逻辑，用于检验
     """
-    message = []
+    errors = []
     validator = {
-        'university': [(lambda x: x.unversity is None, '为空')],
+        'university': [(lambda x: x.university == '', '为空')],
         'major_student_amount': [
-            (lambda x: x.major_student_amount is None, '为空'),
+            (lambda x: x.major_student_amount == 0, '为0'),
             (lambda x: x.major_student_amount < x.rank, '小于个人排名')
         ],
-        'gpa': [(lambda x: x>100, '大于100')]
+        'gpa': [(lambda x: x.gpa>100, '大于100')]
     }
-    for f in resume._meta._fields():
-        if f.name == 'student':
-            continue
-        else:
-            for v in validator[f.name]:
-                if v[0](resume):
-                    message.append((f.name, '不能'+v[1]))
-    return message
+    for f in resume.__dict__.keys():
+        if f in validator.keys():
+            for v in validator[f]:
+                try:
+                    if v[0](resume):
+                        errors.append({'name': f, 'msg': '不能'+v[1]})
+                        break
+                except:
+                    errors.append({'name': f, 'msg': '不能为空'})
+                    break
+    return errors
 
-class GlobalVar(object):
-    from django.core.cache import cache
-    @staticmethod
-    def get():
-        pass
+
+def check_deadline_pass():
+    # TODO: 实现检测是否过了deadline的工具函数
+    return False

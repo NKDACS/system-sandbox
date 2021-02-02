@@ -47,7 +47,7 @@ def IDValidator(value):
 UNIVERSITY = [
     ('天津',
         [('4112010055', '南开大学')]
-     ),
+    ),
     ('北京',
         [
             ('4111010003', '清华大学'),
@@ -63,10 +63,21 @@ def check_resume(resume):
     这里定义简历字段逻辑，用于检验
     """
     message = []
-    if resume.major_student_amount < resume.rank:
-        message.append((resume.major_student_amount.verbose_name, '小于个人排名'))
-    if resume.gpa > 100:
-        message.append((resume.gpa.verbose_name, '学分绩大于100'))
+    validator = {
+        'university': [(lambda x: x.unversity is None, '为空')],
+        'major_student_amount': [
+            (lambda x: x.major_student_amount is None, '为空'),
+            (lambda x: x.major_student_amount < x.rank, '小于个人排名')
+        ],
+        'gpa': [(lambda x: x>100, '大于100')]
+    }
+    for f in resume._meta._fields():
+        if f.name == 'student':
+            continue
+        else:
+            for v in validator[f.name]:
+                if v[0](resume):
+                    message.append((f.name, '不能'+v[1]))
     return message
 
 class GlobalVar(object):

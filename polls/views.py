@@ -60,16 +60,13 @@ def register(request):
             if password1 != password2:  # 判断两次密码是否相同
                 message = "两次输入的密码不同！"
                 return render(request, template_path, locals())
-            same_name_user = User.objects.filter(username=username)
-            if same_name_user:  # 用户名唯一
+            if User.objects.filter(username=username).exists():  # 用户名唯一
                 message = '用户已经存在，请重新选择用户名！'
                 return render(request, template_path, locals())
-            same_email_user = User.objects.filter(email=email)
-            if same_email_user:  # 邮箱地址唯一
+            if User.objects.filter(email=email).exists():  # 邮箱地址唯一
                 message = '该邮箱地址已被注册，请使用别的邮箱！'
                 return render(request, template_path, locals())
-            same_id_user = User.objects.filter(person_id=person_id)
-            if same_id_user:  # 邮箱地址唯一
+            if User.objects.filter(person_id=person_id).exists():  # 邮箱地址唯一
                 message = '该身份证号已被注册，如非本人操作请联系管理员！'
                 return render(request, template_path, locals())
             # 当一切都OK的情况下，创建新用户
@@ -135,15 +132,13 @@ def edit_profile_view(request):
                 else:
                     user.set_password(password1)
             if username is not None:
-                same_name_user = User.objects.filter(username=username).exclude(id=user.id)
-                if same_name_user:  # 用户名唯一
+                if User.objects.filter(username=username).exclude(id=user.id).exists():  # 用户名唯一
                     message += '用户已经存在，请重新选择用户名！'
                     return render(request, template_path, locals())
                 else:
                     user.username = username
             if email != '':
-                same_email_user = User.objects.filter(email=email).exclude(id=user.id)
-                if same_email_user:  # 邮箱地址唯一
+                if User.objects.filter(email=email).exclude(id=user.id).exists():  # 邮箱地址唯一
                     message += '该邮箱地址已被注册！'
                     return render(request, template_path, locals())
                 else:
@@ -256,4 +251,7 @@ def delete_anounce_view(request, pk):
 
 @login_required
 def check_submit_view(request):
+    user = User.objects.get(id=request.user.id)
+    resume = Resume.objects.get()
+    # return render(request, 'polls/')
     pass

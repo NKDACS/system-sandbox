@@ -26,6 +26,8 @@
 <script>
 onload=function () {
     $("#id_university").chosen({
+        allow_single_deselect: false,
+        no_results_text: '没有学校或地区包含',
         placeholder_text_single: '请选择您的本科院校',
         width: "95%"
     });

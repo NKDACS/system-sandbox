@@ -93,10 +93,11 @@ onload=function () {
     if (message != '') {
         console.log(message)
         if (message.indexOf('成功') != -1) {
-            toastr.success(message)
-            $("#successModal").toggle()
+            // toastr.success(message)
+            $("#successModal").modal('show')
+        } else {
+            toastr.warning(message)
         }
-        toastr.warning(message)
     }
 };
 </script>

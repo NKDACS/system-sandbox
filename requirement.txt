@@ -2,4 +2,7 @@ Django==3.1.5
 django-ranged-response
 django-simple-captcha
 django-summernote
+redis
+django-redis
+django-redis-cache
 uwsgi

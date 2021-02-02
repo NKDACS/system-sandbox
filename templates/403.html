@@ -1,0 +1,12 @@
+<!-- extends表明此页面继承自 base.html 文件 -->
+{% extends "base.html" %}
+{% load static %}
+{% block title %}错误403{% endblock title %}
+{% block content %}
+<div class="container" style="padding:3rem;">
+    <h3 class="text-center" style="margin:4rem">您没有权限访问此页面</h3>
+    <a href="#" onClick="javaScript:history.go(-1)">
+        <h5 class="text-center">返回上一页</h5>
+    </a>
+</div>
+{% endblock content %}

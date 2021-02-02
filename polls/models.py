@@ -31,6 +31,7 @@ class Anoucement(models.Model):
 
     class Meta:
         verbose_name = '公告'
+        indexes = [models.Index(fields=['-public_time'])]
 
     def __str__(self):
         return self.title

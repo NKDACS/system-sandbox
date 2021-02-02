@@ -53,6 +53,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.cache.UpdateCacheMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
 ]
 
 ROOT_URLCONF = 'system.urls'
@@ -174,3 +176,27 @@ if not DEBUG:
     STATIC_URL = PRODUCTION_URL_PREFIX + STATIC_URL
     LOGIN_REDIRECT_URL = PRODUCTION_URL_PREFIX + LOGIN_REDIRECT_URL
     MEDIA_URL = PRODUCTION_URL_PREFIX + MEDIA_URL
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        # url格式 redis://[:password]@host:port/0
+        # 可以在url指定redis的密码，0表示低0个数据库
+        'LOCATION': secret.REDIS_LOCATION,
+        'OPTIONS': {
+            "CLIENT_CLASS": 'django_redis.client.DefaultClient',
+            'PASSWORD': secret.REDIS_PASSWORD,
+        },
+        # 自定义键名命名规则
+        # 'KEY_FUNCTION': KEY_FUNCTION,
+    }
+}
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
+if DEBUG:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        }
+    }
+    SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+

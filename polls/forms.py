@@ -5,6 +5,7 @@ from django import forms
 from captcha.fields import CaptchaField
 from django.contrib.auth.forms import PasswordResetForm
 from django.core.validators import MinLengthValidator
+from django_summernote.widgets import SummernoteWidget
 
 User = get_user_model()
 
@@ -84,4 +85,9 @@ class ResumeForm(forms.ModelForm):
 class AnouncementForm(forms.ModelForm):
     class Meta:
         model = Anoucement
-        fields = '__all__'
+        fields = ['title', 'content', 'public_time']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'content': SummernoteWidget(attrs={'class': 'form-control'}),
+            'public_time': forms.DateTimeInput()
+        }

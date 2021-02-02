@@ -1,17 +1,20 @@
 import logging
-from django.urls.base import reverse
-from django.shortcuts import redirect, render
-from django.utils.http import urlsafe_base64_decode
+from django.urls.base import reverse, reverse_lazy
+from django.shortcuts import get_object_or_404, redirect, render
+from django.conf import settings
 from django.http import JsonResponse
 from django.views.generic import ListView
+# from django.views.decorators.cache import cache_page
 from django.contrib.auth import get_user_model
+from django.contrib.admin.views.decorators import staff_member_required
 from django.utils import timezone
 from django.utils.encoding import force_text
+from django.utils.http import urlsafe_base64_decode
 from django.core.exceptions import PermissionDenied
 from .models import *
 from .utils import account_activation_token, send_activate_email
 from . import forms
-from django.conf import settings
+
 
 logger = logging.getLogger(__name__)
 
@@ -86,13 +89,15 @@ def register(request):
                 user.save()
                 message = '注册成功，请登录注册邮箱激活账号'
             except Exception as e:
-                logger.error(e.__traceback__())
+                import traceback
+                traceback.print_exc()
                 message = '激活邮件发送失败，请联系管理员'
+                user.delete()
     return render(request, template_path, locals())
 
 
 def activate_account_view(request, uidb64, token):
-    template_path = 'polls/acount_verify_result.html'
+    template_path = 'polls/account_activate_result.html'
     try:
         uid = force_text(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
@@ -164,7 +169,7 @@ def edit_resume_view(request):
     resume_form = forms.ResumeForm(instance=resume)
     if request.method == "POST":
         resume_form = forms.ResumeForm(request.POST, instance=resume)
-        message = "更新失败，输入不符合要求："
+        message = "未知错误"
         if resume_form.is_valid():  # 获取数据
             logger.debug(resume_form.cleaned_data)
             try:
@@ -177,28 +182,26 @@ def edit_resume_view(request):
     return render(request, template_path, locals())
 
 
-class AnounceListView(ListView):
+class anounce_list_view(ListView):
     template_name = 'polls/anounce_index.html'
     context_object_name = 'anounce_list'
     paginate_by = 10
 
-    def get_queryset(self):
-        return Anoucement.objects.filter(public_time__lte=timezone.now()).order_by('-public_time')
+    def get_queryset(self, request):
+        if request.user.is_staff:
+            return Anoucement.objects.order_by('-public_time')
+        else:
+            return Anoucement.objects.filter(public_time__lte=timezone.now()).order_by('-public_time')
 
     def get(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return redirect(reverse('login'))
-        return super().get(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        n = self.get_queryset().count() // self.paginate_by + 1
-        context['num_list_left'] = list(range(1, min(4, n+1)))
-        context['num_list_right'] = list(range(max(min(4, n+1), n-2), n+1))
-        return context
+        # if not request.user.is_authenticated:
+        #     return redirect(reverse('login'))
+        self.object_list = self.get_queryset(request)
+        context = self.get_context_data()
+        return self.render_to_response(context)
 
 
-def AnounceLatestListView(request, num=-1):
+def latest_anounce_list_view(request, num=-1):
     set = Anoucement.objects.filter(
         public_time__lte=timezone.now()).order_by('-public_time').values('id', 'title', 'public_time')
     if num != -1:
@@ -211,8 +214,40 @@ def AnounceLatestListView(request, num=-1):
         })
     return JsonResponse(data)
 
-def AnounceDetailView(request, pk):
+def detail_anounce_view(request, pk):
     anounce = Anoucement.objects.get(id=pk)
     if anounce.public_time > timezone.now() and not (request.user.is_authenticated and request.user.is_staff):
         raise PermissionDenied
-    return render(request, 'polls/anounce_detail.html', locals())
+    return render(request, 'polls/anounce_detail.html', {'anounce': anounce})
+
+
+@staff_member_required(login_url=reverse_lazy('login'))
+def edit_anounce_view(request, pk=0):
+    template_path = 'polls/anounce_edit.html'
+    if pk:
+        anounce = Anoucement.objects.get(id=pk)
+    else:
+        anounce = Anoucement.objects.create()
+    anounce_form = forms.AnouncementForm(instance=anounce)
+    if request.method == 'POST':
+        anounce_form = forms.AnouncementForm(request.POST, instance=anounce)
+        message = "未知错误"
+        if anounce_form.is_valid():
+            logger.debug(anounce_form.cleaned_data)
+            try:
+                anounce_form.save()
+                message = '修改成功'
+            except:
+                message = '修改失败'
+        else:
+            message = anounce_form.errors.as_text()
+    return render(request, template_path, locals())
+
+
+@staff_member_required(login_url=reverse_lazy('login'))
+def delete_anounce_view(request, pk):
+    anounce = get_object_or_404(Anoucement, id=pk)
+    if request.method == 'POST':
+        anounce.delete()
+        return redirect(reverse('anounce_index'))
+    return render(request, 'polls/anounce_delete.html', {'anounce': anounce})

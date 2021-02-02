@@ -6,8 +6,18 @@
 <div class="container" style="padding-top:3rem; padding-bottom: 5rem;">
     <h3>{{anounce.title}}</h3>
     <p>{{anounce.public_time | date:'Y-m-d H:i:s' }}</p>
-    <div class="row">
+    <div class="row" style="margin-bottom:1rem;">
     {{anounce.content | safe}}
     </div>
+    {% if request.user.is_staff %}
+    <a href="{% url 'anounce_edit' anounce.id %}">
+    <button type="button" class="btn btn-primary">编辑</button>
+    </a>
+    <a href="{% url 'anounce_delete' anounce.id %}">
+    <button type="button" class="btn btn-danger">删除</button>
+    </a>
+    {% endif %}
 </div>
+<script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+<script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
 {% endblock body %}

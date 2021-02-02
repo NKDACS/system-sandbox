@@ -8,6 +8,7 @@
     <!-- 引入bootstrap的css文件 -->
     <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'toastr/toastr.min.css' %}">
+    <link rel="stylesheet" href="{% static 'jquery.datetimepicker.min.css' %}"/>
     <link rel="stylesheet" href="{% static 'style.css' %}">
     <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}">
 </head>
@@ -24,11 +25,11 @@
     <script src="{% static 'popper.js' %}"></script>
     <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
     <script src="{% static 'toastr/toastr.min.js' %}"></script>
+    <script src="{% static 'jquery.datetimepicker.full.min.js' %}"></script>
     <script>
         $(document).ready(function(){
             console.log(`%c
 DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
-D                                                                              D
 D                                                                              D
 D       DD      DD  DDD   DDD   DDDDDDDD    DDDDDDD    DDDDDDD    DDDDDD       D
 D       DDDD    DD  DDD  DD     DDD   DD   DDD   DD   DDD    D   DDD   D       D
@@ -40,12 +41,12 @@ D       D    DDDDD  DDD DDD     DDD   DD   DDD   DD   DDD            DDD       D
 D       D     DDDD  DDD  DDD    DDD  DDD   DDD   DD   DDDD   D   DD  DDD       D
 D       D       DD  DDD   DDD   DDDDDDD    DDD   DD     DDDDD     DDDDD        D
 D                                                                              D
-D                                                                              D
-DDDDDDDDDDD                                                          DDDDDDDDDDD
 DDDDDDDDDDD                                                          DDDDDDDDDDD
 
+
     @NKDACS 2021
-    Left blank here for co-authors`, 'color: #6cf'),
+    Left blank here for co-authors`, 'color: #6cf')
+            jQuery.datetimepicker.setLocale('zh');
             $.get("{% url 'anounce_list' 5 %}", {}, function(resp){
                 for(var k=0;k<resp['list'].length;k++){
                     i = resp['list'][k]

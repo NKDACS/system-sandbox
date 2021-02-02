@@ -22,9 +22,12 @@ urlpatterns = [
     url(r'^register/$', views.register, name='register'),
     url(r'^editprofile/$', views.edit_profile_view, name='editprofile'),
     url(r'^editresume/$', views.edit_resume_view, name='editresume'),
-    path('anounce/index/', views.AnounceListView.as_view(), name='anounce_index'),
-    path('anounce/latest/<int:num>/', views.AnounceLatestListView, name='anounce_list'),
-    path('anounce/<int:pk>/', views.AnounceDetailView, name='anounce_detail'),
+    path('anounce/index/', views.anounce_list_view.as_view(), name='anounce_index'),
+    path('anounce/latest/<int:num>/', views.latest_anounce_list_view, name='anounce_list'),
+    path('anounce/<int:pk>/', views.detail_anounce_view, name='anounce_detail'),
+    path('anounce/edit/', views.edit_anounce_view, name='anounce_edit'),
+    path('anounce/edit/<int:pk>/', views.edit_anounce_view, name='anounce_edit'),
+    path('anounce/delete/<int:pk>/', views.delete_anounce_view, name='anounce_delete'),
     #密码重置链接
     url(
         r'^password_reset/$', 

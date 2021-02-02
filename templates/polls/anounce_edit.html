@@ -1,0 +1,45 @@
+<!-- extends表明此页面继承自 base.html 文件 -->
+{% extends "base.html" %}
+{% load static %}
+{% block title %}修改简历{% endblock %}
+{% block body %}
+<div class="container d-flex justify-content-between" style="margin:3rem;">
+    <div class="col-md-6" style="width:50%">
+    <form class='form-anounce' action="{% url 'anounce_edit' anounce.id %}" method="post">
+        {% csrf_token %}
+        {% for field in anounce_form %}
+        <div class="form-group">
+            {{ field.errors }}
+            {{ field.label_tag }}
+            {{ field }}
+        </div> 
+        {% endfor %}
+        <button type="reset" class="btn btn-light pull-left">重置</button>
+        <a href="{% url 'anounce_index' %}">
+        <button type="button" class="btn btn-secondary">返回</button>
+        </a>
+        <button type="submit" class="btn btn-primary pull-right">保存</button>
+    </form>
+    </div>
+</div> <!-- /container -->
+<script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+<script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+<script>
+onload=function () {
+    message = '{{message}}'
+    console.log(message)
+    toastr.options.positionClass = 'toast-top-center';
+    if (message != '') {
+        if (message.indexOf('成功') != -1) {
+            toastr.success(message)
+        } else {
+            toastr.warning(message)
+        }
+    }
+    $("#id_public_time").datetimepicker( {
+         format:'Y-m-d H:i',
+      });
+};
+</script>
+{% endblock body %}
+

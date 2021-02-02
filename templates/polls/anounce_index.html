@@ -6,6 +6,12 @@
 <div class="container" style="padding-top:3rem; padding-bottom: 5rem;">
     <h2>公告列表</h2>
     <ul class="list-group list-group-flush">
+        <a href="javascript:;" class="list-group-item list-group-item-action">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1"><strong>标题</h5>
+                <span>发布时间</strong></span>
+            </div>
+        </a>
     {% for anounce in page_obj %}
         <a href="{% url 'anounce_detail' anounce.id %}" class="list-group-item list-group-item-action">
             <div class="d-flex w-100 justify-content-between">
@@ -45,6 +51,11 @@
         {% endif %}
         <li class="page-item"><a class="page-link" href="?page={{page_obj.paginator.num_pages}}">尾页</a></li>
     </ul>
+    <div class="row">
+    <a href="{% url 'anounce_edit' 0 %}">
+    <button type="button" class="btn btn-primary">新建公告</button>
+    </a>
+    </b>
     </nav>
 </div>
 {% endblock body %}

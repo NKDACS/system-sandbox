@@ -15,7 +15,7 @@ class TokenGenerator(PasswordResetTokenGenerator):
 account_activation_token = TokenGenerator()
 
 def send_activate_email(request, user):
-    mail_content = render_to_string('email_template.html', {
+    mail_content = render_to_string('polls/account_activate_email.html', {
         'first': user.first_name,
         'last': user.last_name,
         'user': user.username,
@@ -26,7 +26,7 @@ def send_activate_email(request, user):
     send_mail(
         '激活账号 - 南开大学统计与数据科学学院研究生推免报名系统', 
         mail_content, 
-        settings.EMAIL_HOST, 
+        settings.EMAIL_HOST_USER, 
         [user.email]
     )
 
@@ -57,3 +57,4 @@ UNIVERSITY = [
         ]
      )
 ]
+

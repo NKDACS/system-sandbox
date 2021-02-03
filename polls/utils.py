@@ -6,14 +6,17 @@ from django.utils.encoding import force_bytes
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.contrib.staticfiles import finders
+from django.core.cache import cache
+import json, datetime
+from django.utils import timezone
 
 
 class TokenGenerator(PasswordResetTokenGenerator):
     def _make_hash_value(self, user, timestamp):
         return (str(user.pk) + str(timestamp) + str(user.is_active))
 
-
 account_activation_token = TokenGenerator()
+
 
 def send_activate_email(request, user):
     mail_content = render_to_string('polls/account_activate_email.html', {
@@ -46,19 +49,67 @@ def IDValidator(value):
         raise ValueError('请输入正确的身份证号码')
 
 
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime.datetime):
+            return obj.strftime('%Y-%m-%d %H:%M:%S.%f%z')
+        elif isinstance(obj, datetime.date):
+            return obj.strftime('%Y-%m-%d')
+        return json.JSONEncoder.default(self, obj)
+
+
 class GlobalVar(object):
-    from django.core.cache import cache
+    file_path = finders.find('GlobalVar.json')
+    
+    @staticmethod
+    def decode(d:dict):
+        if 'deadline' in d.keys():
+            d['deadline'] = datetime.datetime.strptime(
+                d['deadline'], "%Y-%m-%d %H:%M:%S.%f%z")
+        return d
 
     @staticmethod
+    def get_from_file():
+        f = open(GlobalVar.file_path, 'r', encoding='utf-8')
+        d = json.load(f)
+        d = GlobalVar.decode(d)
+        try:
+            cache.set('GlobalVar', json.dumps(d, cls=DateTimeEncoder), timeout=None)
+        except:
+            pass
+        return d
+    
+    @staticmethod
     def get():
-        pass
+        try:
+            d = json.loads(cache.get('GlobalVar'))
+            d = GlobalVar.decode(d)
+            if d is None:
+                d = GlobalVar.get_from_file()
+            return d
+        except:
+            return GlobalVar.get_from_file()
+    
+    @staticmethod
+    def set(d):
+        try:
+            cache.set('GlobalVar', json.dumps(d, cls=DateTimeEncoder), timeout=None)
+        except:
+            pass
+        with open(GlobalVar.file_path, 'w', encoding='utf-8') as f:
+            if not settings.DEBUG:
+                import fcntl
+                fcntl.flock(f.fileno(), fcntl.LOCK_EX)  # 加锁，其它进程对文件操作则不能成功
+                json.dump(d, f, cls=DateTimeEncoder)
+                fcntl.flock(f.fileno(), fcntl.LOCK_UN)  # 解锁
+            else:
+                json.dump(d, f)
 
 
 def get_university():
     result = finders.find('ChinaUniversityList.json')
-    from json import load
     file = open(result, 'r', encoding='utf-8')
-    d = load(file)
+    d = json.load(file)
     school = []
     for i in d:
         local_school = [(j['code'], j['name']) for j in i['schools']]
@@ -95,5 +146,5 @@ def check_resume(resume):
 
 
 def check_deadline_pass():
-    # TODO: 实现检测是否过了deadline的工具函数
-    return False
+    # print(timezone.now(), GlobalVar.get()['deadline'])
+    return timezone.now() > GlobalVar.get()['deadline']

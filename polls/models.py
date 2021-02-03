@@ -8,7 +8,7 @@ from django.utils import timezone
 from django_summernote.fields import SummernoteTextField
 
 class MyUser(AbstractUser):
-    number = models.PositiveIntegerField(verbose_name='工号/学号', name='number', blank=True, null=True)
+    number = models.PositiveIntegerField(verbose_name='工号', name='number', blank=True, null=True)
     phone = models.CharField(verbose_name='电话', name='phone', blank=True, max_length=11, 
         validators=[MinLengthValidator(11, '请输入11位有效电话')])
     person_id = models.CharField(
@@ -31,6 +31,7 @@ class Anoucement(models.Model):
 
     class Meta:
         verbose_name = '公告'
+        verbose_name_plural = '公告'
         indexes = [models.Index(fields=['-public_time'])]
 
     def __str__(self):
@@ -52,3 +53,4 @@ class Resume(models.Model):
 
     class Meta:
         verbose_name = '简历'
+        verbose_name_plural = '简历'

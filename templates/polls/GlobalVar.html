@@ -1,0 +1,33 @@
+<!-- extends表明此页面继承自 base.html 文件 -->
+{% extends "polls/main.html" %}
+{% load static %}
+{% block title %}系统配置{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="col-md-8 col-md-offset-4">
+        <form class='form-globalvar' action="{% url '' %}" method="post">
+            {% endif %}
+            {% csrf_token %}
+            <h3 class="text-center">系统配置</h3>
+             
+            <button type="reset" class="btn btn-secondary pull-left">重置</button>
+            <button type="submit" class="btn btn-primary">保存</button>
+        </form>
+    </div>
+</div> <!-- /container -->
+<script>
+onload=function () {
+    message = '{{message}}'
+    console.log(message)
+    toastr.options.positionClass = 'toast-top-center';
+    if (message != '') {
+        if (message.indexOf('成功') != -1) {
+            toastr.success(message)
+        } else {
+            toastr.warning(message)
+        }
+    }
+};
+</script>
+{% endblock content %}
+

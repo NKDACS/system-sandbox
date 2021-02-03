@@ -33,10 +33,12 @@
                 {{ profile_form.email.label_tag }}
                 {{ profile_form.email }}
             </div>
+            {% if request.user.is_staff %}
             <div class="form-group">
                 {{ profile_form.number.label_tag }}
                 {{ profile_form.number }}
             </div>
+            {% endif %}
             <div class="form-group">
                 {{ profile_form.phone.label_tag }}
                 {{ profile_form.phone }}

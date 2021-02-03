@@ -21,10 +21,6 @@ class RegisterForm(forms.Form):
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     email = forms.EmailField(label="邮箱地址", widget=forms.EmailInput(attrs={'class': 'form-control'}))
-    number = forms.IntegerField(
-        label="学号/工号(选填)", required=False,
-        widget=forms.NumberInput(attrs={'class': 'form-control'})
-    )
     phone = forms.CharField(
         label='电话', min_length=11, max_length=11, required=False,
         validators=[MinLengthValidator(11, '请输入11位电话号')],
@@ -51,7 +47,7 @@ class UserProfileForm(forms.Form):
         label="邮箱地址", required=False,
         widget=forms.EmailInput(attrs={'class': 'form-control'}))
     number = forms.IntegerField(
-        label="学号/工号(选填)", required=False,
+        label="工号", required=False,
         widget=forms.NumberInput(attrs={'class': 'form-control'})
     )
     phone = forms.CharField(
@@ -98,4 +94,11 @@ class ConfirmSubmitForm(forms.Form):
         label='我已知晓以上内容，确认提交',
         widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         required=True, initial=False
+    )
+
+
+class GlobalVarForm(forms.Form):
+    deadline = forms.DateTimeField(
+        label='简历提交截止日期', required=True,
+        widget=forms.DateTimeInput()
     )

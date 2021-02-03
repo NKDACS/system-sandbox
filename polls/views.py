@@ -1,4 +1,5 @@
 import logging
+from django.contrib.auth.models import Group
 from django.urls.base import reverse, reverse_lazy
 from django.shortcuts import get_object_or_404, redirect, render
 from django.conf import settings
@@ -14,7 +15,7 @@ from django.utils.http import urlsafe_base64_decode
 from django.core.exceptions import PermissionDenied
 from django.db import DatabaseError, transaction
 from .models import *
-from .utils import account_activation_token, check_deadline_pass, check_resume, send_activate_email
+from .utils import *
 from . import forms
 
 
@@ -73,7 +74,6 @@ def register(request):
                 username=username,
                 email=email,
                 password=None,
-                number=register_form.cleaned_data['number'],
                 phone=register_form.cleaned_data['phone'],
                 first_name=register_form.cleaned_data['first_name'],
                 last_name=register_form.cleaned_data['last_name'],
@@ -102,6 +102,7 @@ def activate_account_view(request, uidb64, token):
         user = None
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
+        user.groups.add(Group.objects.get(name='student'))
         user.save()
         return render(request, template_path, {'message': True})
     else:
@@ -191,8 +192,7 @@ def edit_resume_view(request):
 
 @login_required
 def check_submit_view(request):
-    user = User.objects.get(id=request.user.id)
-    resume = Resume.objects.get(student=user)
+    resume = get_object_or_404(Resume, student=request.user.id)
     is_submitted = resume.submitted
     errors = check_resume(resume) if not is_submitted else []
     if not len(errors):
@@ -309,6 +309,8 @@ class StudentListView(ListView):
     context_object_name = 'user_list'
 
     def get_queryset(self):
+        if settings.DEBUG:
+            return User.objects.all()
         return User.objects.filter(is_staff=False)
 
     def get(self, request, *args, **kwargs):
@@ -321,3 +323,17 @@ class StudentListView(ListView):
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
         return data
+
+
+@staff_member_required(login_url=reverse_lazy('login'))
+def teacher_send_mail_view(request):
+    pass
+
+
+#------------------------------------------------------------------------------
+#   系统设置视图
+#------------------------------------------------------------------------------
+
+@staff_member_required(login_url=reverse_lazy('login'))
+def set_globalvar_view(request):
+    pass 

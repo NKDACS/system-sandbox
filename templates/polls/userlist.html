@@ -3,10 +3,9 @@
 {% load static %}
 {% block title %}用户列表{% endblock title %}
 {% block body %}
-<div class="container", style="padding:3rem;">
+<div class="container-fluid", style="padding:3rem;">
     <h3>用户列表</h3>
     <table class="table table-striped">
-    <caption>条纹表格布局</caption>
     <thead><tr>
         <th>姓名</th>
         <th>身份证号</th>
@@ -22,7 +21,8 @@
             <td>{{item.person_id}}</td>
             <td>{{item.email}}</td>
             <td>{{item.phone}}</td>
-            <td>{{item.submitted}}</td><td></td>
+            <td>{{item.submitted}}</td>
+            <td></td>
         </tr>
     {% endfor %}
     </tbody>

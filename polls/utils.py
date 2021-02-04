@@ -10,6 +10,9 @@ from django.core.cache import cache
 import json, datetime
 from django.utils import timezone
 
+#------------------------------------------------------------------------------
+#   邮件 & 验证码
+#-----------------------------------------------------------------------------
 
 class TokenGenerator(PasswordResetTokenGenerator):
     def _make_hash_value(self, user, timestamp):
@@ -33,7 +36,13 @@ def send_activate_email(request, user):
         settings.EMAIL_HOST_USER, 
         [user.email]
     )
+    
+def send_mail_with_attach():
+    pass
 
+#------------------------------------------------------------------------------
+#   自定义Validator
+#------------------------------------------------------------------------------
 def IDValidator(value):
     #身份证号码验证
     Wi = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2]
@@ -49,6 +58,9 @@ def IDValidator(value):
         raise ValueError('请输入正确的身份证号码')
 
 
+#------------------------------------------------------------------------------
+#   全局配置 & JSON & Cache
+#------------------------------------------------------------------------------
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime.datetime):
@@ -106,6 +118,9 @@ class GlobalVar(object):
                 json.dump(d, f, cls=DateTimeEncoder)
 
 
+#------------------------------------------------------------------------------
+#   简历验证相关
+#------------------------------------------------------------------------------
 def get_university():
     result = finders.find('ChinaUniversityList.json')
     file = open(result, 'r', encoding='utf-8')
@@ -117,7 +132,6 @@ def get_university():
     return school
 
 UNIVERSITY = get_university()
-
 
 def check_resume(resume):
     """

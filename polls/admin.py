@@ -53,11 +53,15 @@ class MyUserAdmin(UserAdmin):
     actions = [delete_old, set_teacher, set_student]
 
 
+class ResumeResultInline(admin.TabularInline):
+    model = ResumeResult
+
+
 class ResumeAdmin(ModelAdmin):
     list_display = (
         '__str__', 
         'name_display', 'id_display', 'email_display', 'phone_display', 
-        'university', 'submitted', 'special_permit')
+        'university', 'submitted', 'special_permit', 'admiss_display')
 
     def name_display(self, obj):
         return (obj.student.last_name or '') + (obj.student.first_name or '')
@@ -75,8 +79,11 @@ class ResumeAdmin(ModelAdmin):
         return obj.student.phone
     phone_display.short_description = '手机'
 
+    def admiss_display(self, obj):
+        return ResumeResult.objects.get(resume=obj).admiss
+    admiss_display.short_description = '录取'
+
     def reject(self, request, queryset: QuerySet):
-        from django.utils.timezone import now
         try:
             num = queryset.update(special_permit=True, submitted=False)
             self.message_user(
@@ -85,23 +92,51 @@ class ResumeAdmin(ModelAdmin):
             self.message_user(request, e.__str__(), messages.ERROR)
     reject.short_description = '将选中简历打回修改'
 
-    actions = [reject]
-    
+    def admiss(self, request, queryset: QuerySet):
+        try:
+            for obj in queryset:
+                r = ResumeResult.objects.get(resume=obj)
+                r.admiss = True
+                r.save()
+            self.message_user(
+                request, '将{}份简历设为录取'.format(queryset.count()), messages.SUCCESS)
+        except Exception as e:
+            self.message_user(request, e.__str__(), messages.ERROR)
+    admiss.short_description = '将选中考生设为录取'
+
+    def admiss_reverse(self, request, queryset: QuerySet):
+        try:
+            for obj in queryset:
+                r = ResumeResult.objects.get(resume=obj)
+                r.admiss = False
+                r.save()
+            self.message_user(
+                request, '将{}份简历取消录取'.format(queryset.count()), messages.SUCCESS)
+        except Exception as e:
+            self.message_user(request, e.__str__(), messages.ERROR)
+    admiss_reverse.short_description = '将选中考生取消录取'
+
+    actions = [reject, admiss, admiss_reverse]
+    inlines = [ResumeResultInline]
 
 
+# 将模型注册到后台
 admin.site.register(MyUser, MyUserAdmin)
 admin.site.register(Resume, ResumeAdmin)
-admin.site.register([Anoucement])
+admin.site.register([Anoucement, ResumeResult])
 
+# 自动建立教师和学生两个用户组
 if not Group.objects.filter(name='teacher').exists():
     teacher = Group.objects.create(name='teacher')
     teacher.permissions.add(
         Permission.objects.get(codename='polls.view_MyUser'),
         Permission.object.get(codename='polls.view_Resume'),
+        Permission.object.get(codename='polls.change_Resume'),
         Permission.object.get(codename='polls.view_Anouncement'),
         Permission.object.get(codename='polls.add_Anouncement'),
         Permission.object.get(codename='polls.delete_Anouncement'),
-        Permission.object.get(codename='polls.change_Anouncement'),
+        Permission.object.get(codename='polls.view_ResumeResult'),
+        Permission.object.get(codename='polls.change_ResumeResult'),
     )
     teacher.save()
 

@@ -65,5 +65,8 @@ urlpatterns = [
         PasswordResetCompleteView.as_view(template_name='polls/password_reset_complete.html'), 
         name='password_reset_complete'
     ),
-    path("globalvar/", views.set_globalvar_view, name="globalvar"),
+    #管理“全局设置”url
+    path('globalvar/', views.set_globalvar_view, name='globalvar'),
+    #群发邮件
+    url(r'^teacher_email/$', views.teacher_send_email_view, name='teacher_send_email'),
 ]

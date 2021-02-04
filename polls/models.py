@@ -55,3 +55,14 @@ class Resume(models.Model):
     class Meta:
         verbose_name = '简历'
         verbose_name_plural = '简历'
+
+
+class ResumeResult(models.Model):
+    resume = models.OneToOneField(Resume, on_delete=models.CASCADE, verbose_name='对应简历')
+    score = models.FloatField(verbose_name='建议得分', default=0)
+    rank = models.IntegerField(verbose_name='建议排名', default=0, blank=True)
+    admiss = models.BooleanField(verbose_name='录取', default=False, blank=False)
+
+    class Meta:
+        verbose_name = '简历评定'
+        verbose_name_plural = '简历评定'

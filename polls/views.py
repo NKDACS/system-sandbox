@@ -1,4 +1,5 @@
 import logging
+import traceback
 from django.contrib.auth.models import Group
 from django.urls.base import reverse, reverse_lazy
 from django.shortcuts import get_object_or_404, redirect, render
@@ -86,7 +87,6 @@ def register(request):
                 user.save()
                 message = '注册成功，请登录注册邮箱激活账号'
             except Exception as e:
-                import traceback
                 traceback.print_exc()
                 message = '激活邮件发送失败，请联系管理员'
                 user.delete()
@@ -181,9 +181,11 @@ def edit_resume_view(request):
                 if resume.special_permit:
                     resume.submitted = False
                 resume.save()
+                resume_result = ResumeResult.objects.get_or_create(resume=resume)[0]
+                resume_result.save()
                 message = '修改成功'
-            except:
-                message = '修改失败'
+            except Exception as e:
+                message = '修改失败'+e.__str__()
         else:
             message = resume_form.errors.as_text()
     return render(request, template_path, locals())
@@ -327,8 +329,36 @@ class StudentListView(ListView):
 
 
 @staff_member_required(login_url=reverse_lazy('login'))
-def teacher_send_mail_view(request):
-    pass
+def teacher_send_email_view(request):
+    selected = {'to': [str(i.resume.student.id) for i in ResumeResult.objects.filter(
+        admiss=True)]} if request.GET.get('admiss') else {}
+    email_form = forms.SendMultiMailForm(initial=selected)
+    if request.method == 'POST':
+        message = '未知错误'
+        email_form = forms.SendMultiMailForm(request.POST, request.FILES)
+        files = request.FILES.getlist('attach')
+        logger.info(files)
+        if email_form.is_valid():
+            try:
+                to_user = MyUser.objects.filter(id__in=[int(i) for i in email_form.cleaned_data['to']])
+                from django.core.mail import EmailMessage
+                email = EmailMessage(
+                    subject=email_form.cleaned_data['title'],
+                    body=render_to_string(
+                        'polls/general_email.html', {'content': email_form.cleaned_data['content']}),
+                    from_email=settings.EMAIL_HOST_USER,
+                    to=[i['email'] for i in to_user.values('email')],
+                )
+                for f in files:
+                    if f.size > 1024*1024*49:
+                        raise Exception('超过50M的文件无法通过附件发送')
+                    email.attach(f._name, f.read())
+                email.send()
+                message = '发送成功'
+            except Exception as e:
+                message = e.__str__()
+                traceback.print_exc()
+    return render(request, 'polls/teacher_send_email.html', locals())
 
 
 #------------------------------------------------------------------------------

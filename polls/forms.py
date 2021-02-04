@@ -1,3 +1,4 @@
+from django_summernote.fields import SummernoteTextFormField
 from polls.models import Resume, Anoucement
 from polls import utils
 from django.contrib.auth import get_user_model
@@ -6,6 +7,9 @@ from captcha.fields import CaptchaField
 from django.contrib.auth.forms import PasswordResetForm
 from django.core.validators import MinLengthValidator
 from django_summernote.widgets import SummernoteWidget
+from django.contrib.auth import get_user_model
+from django.db.models import CharField, Value as V
+from django.db.models.functions import Concat
 
 User = get_user_model()
 
@@ -84,7 +88,7 @@ class AnouncementForm(forms.ModelForm):
         fields = ['title', 'content', 'public_time']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
-            'content': SummernoteWidget(attrs={'class': 'form-control'}),
+            'content': SummernoteWidget(),
             'public_time': forms.DateTimeInput()
         }
 
@@ -92,7 +96,7 @@ class AnouncementForm(forms.ModelForm):
 class ConfirmSubmitForm(forms.Form):
     i_confirm = forms.BooleanField(
         label='我已知晓以上内容，确认提交',
-        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        widget=forms.CheckboxInput(),
         required=True, initial=False
     )
 
@@ -106,3 +110,33 @@ class GlobalVarForm(forms.Form):
         label='问题反馈邮箱', required=True,
         widget=forms.TextInput()
     )
+
+
+class SendMultiMailForm(forms.Form):
+    title = forms.CharField(
+        label='邮件标题', max_length=32, 
+        required=True, initial='通知 - 南开大学统计与数据科学学院推免报名系统',
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    content = SummernoteTextFormField(
+        label='邮件正文', required=True,
+        widget=SummernoteWidget(attrs={'class': 'form-control'})
+    )
+    attach = forms.FileField(
+        label='附件', allow_empty_file=False,
+        max_length=128, required=False,
+        widget=forms.ClearableFileInput(attrs={'multiple': True})
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        q = choices = get_user_model().objects.annotate(
+            label=Concat('last_name', 'first_name', V('('), 'person_id', V(')'),
+            output_field=CharField())
+        ).values('id', 'label')
+        self.fields['to'] = forms.MultipleChoiceField(
+            label='收件人',
+            choices=[(o['id'], o['label']) for o in q],
+            required=True,
+            widget=forms.SelectMultiple(attrs={'class': 'form-control'})
+        )

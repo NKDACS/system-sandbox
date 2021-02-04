@@ -169,6 +169,18 @@ DEFAULT_FROM_EMAIL = secret.EMAIL_HOST_USER
 # SUMMERNOTE Config
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+SUMMERNOTE_THEME = 'bs4'
+SUMMERNOTE_CONFIG = {
+    'css_for_inplace': (
+        'bootstrap/css/bootstrap.min.css',
+    ),
+    'js_for_inplace': (
+        'jquery.min.js',
+        'bootstrap/js/bootstrap.min.js'
+    ),
+    'attachment_absolute_uri': True,
+    'width': '100%',
+}
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 

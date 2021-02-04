@@ -15,7 +15,7 @@
         这里可以写一些说明
         <form class='form-confirm' action="{% url 'check_and_submit' %}" method="post">
             {% csrf_token %}
-            {% if is_submitted %}
+            {% if disable %}
             <button type="button" class="btn btn-primary pull-right" disabled>已提交</button>
             <strong>您已提交，如需修改请联系管理员</strong>
             {% else %}

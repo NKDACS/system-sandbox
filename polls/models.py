@@ -50,6 +50,7 @@ class Resume(models.Model):
     other_prize_penalty = models.TextField(verbose_name='其他奖励惩罚', max_length=1024, blank=True)
     others = models.TextField(verbose_name='备注', max_length=1024, blank=True)
     submitted = models.BooleanField(verbose_name='是否已提交', default=False, blank=False)
+    special_permit = models.BooleanField(verbose_name='是否打回修改', default=False, blank=False)
 
     class Meta:
         verbose_name = '简历'

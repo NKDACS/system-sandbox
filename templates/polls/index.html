@@ -21,6 +21,14 @@
         <a href="{% url 'anounce_index' %}" class="d-inline-flex p-2 ">查看更多</a>
         </div>
     </div>
+    <div class="col-md-4">
+    </div>
+    <div class="col-md-4">
+        <h5>注意</h5>
+        <p><strong>报名截止时间：{{ globalvar.deadline }}</strong></p>
+        <p>如在报名过程中出现问题，<br/>请通过如下方式联系管理员：<br/>
+        邮箱: {{globalvar.contact}}</p>
+    </div>
 </div>
 </div>
 {% endblock content %}

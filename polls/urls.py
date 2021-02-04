@@ -65,4 +65,5 @@ urlpatterns = [
         PasswordResetCompleteView.as_view(template_name='polls/password_reset_complete.html'), 
         name='password_reset_complete'
     ),
+    path("globalvar/", views.set_globalvar_view, name="globalvar"),
 ]

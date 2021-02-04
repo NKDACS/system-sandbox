@@ -7,6 +7,11 @@
     <div class="row">
     <div class="col-md-8 col-md-offset-4">
         <form class='form-resume' action="{% url 'editresume' %}" method="post">
+            {% if disable %}
+            <fieldset disabled>
+            {% else %}
+            <fieldset >
+            {% endif %}
             {% csrf_token %}
             <h4 class="text-center">
             {{request.user.last_name|safe}}{{request.user.first_name|safe}}的简历
@@ -21,6 +26,7 @@
             <button type="reset" class="btn btn-secondary pull-left">重置</button>
             <button type="submit" class="btn btn-primary pull-right">保存</button>
             您随时可以保存
+            </fieldset>
         </form>
     </div>
     <div class="col-md-4">

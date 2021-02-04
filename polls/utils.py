@@ -103,7 +103,7 @@ class GlobalVar(object):
                 json.dump(d, f, cls=DateTimeEncoder)
                 fcntl.flock(f.fileno(), fcntl.LOCK_UN)  # 解锁
             else:
-                json.dump(d, f)
+                json.dump(d, f, cls=DateTimeEncoder)
 
 
 def get_university():
@@ -132,19 +132,28 @@ def check_resume(resume):
         ],
         'gpa': [(lambda x: x.gpa>100, '大于100')]
     }
-    for f in resume.__dict__.keys():
-        if f in validator.keys():
-            for v in validator[f]:
+    for f in resume._meta.fields:
+        if f.name in validator.keys():
+            for v in validator[f.name]:
                 try:
                     if v[0](resume):
-                        errors.append({'name': f, 'msg': '不能'+v[1]})
+                        errors.append(
+                            {'name': f.verbose_name, 'msg': '不能'+v[1]})
                         break
                 except:
-                    errors.append({'name': f, 'msg': '不能为空'})
+                    errors.append(
+                        {'name': f.verbose_name, 'msg': '不能为空'})
                     break
     return errors
 
 
-def check_deadline_pass():
-    # print(timezone.now(), GlobalVar.get()['deadline'])
-    return timezone.now() > GlobalVar.get()['deadline']
+def check_disable_or_not(resume):
+    if resume.special_permit:
+        return False, ''
+    elif resume.submitted:
+        return True, '简历已提交无法更改'
+    elif timezone.now() > GlobalVar.get()['deadline']:
+        return True, '截止提交时间已过'
+    else:
+        return False, ''
+    

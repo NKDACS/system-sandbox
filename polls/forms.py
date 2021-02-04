@@ -102,3 +102,7 @@ class GlobalVarForm(forms.Form):
         label='简历提交截止日期', required=True,
         widget=forms.DateTimeInput()
     )
+    contact = forms.EmailField(
+        label='问题反馈邮箱', required=True,
+        widget=forms.TextInput()
+    )

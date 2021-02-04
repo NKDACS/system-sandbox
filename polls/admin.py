@@ -24,8 +24,8 @@ class MyUserAdmin(UserAdmin):
             num = queryset.filter(date_joined__lte=now().replace(
                 year=now().year-1)).delete()
             self.message_user(request, '{}个过期账号删除成功'.format(num), messages.SUCCESS)
-        except:
-            self.message_user(request, '错误：删除失败', messages.ERROR)
+        except Exception as e:
+            self.message_user(request, e.__str__(), messages.ERROR)
     delete_old.short_description = '删除选中账号中所有一年以前注册的'
 
     def set_teacher(self, request, queryset: QuerySet):
@@ -35,8 +35,8 @@ class MyUserAdmin(UserAdmin):
                 obj.is_staff = True
                 obj.save()
             self.message_user(request, '将{}个账号变更为教师'.format(queryset.count()), messages.SUCCESS)
-        except:
-            self.message_user(request, '错误：变更失败', messages.ERROR)
+        except Exception as e:
+            self.message_user(request, e.__str__(), messages.ERROR)
     set_teacher.short_description = '将选中账号设为教师'
 
     def set_student(self, request, queryset):
@@ -46,8 +46,8 @@ class MyUserAdmin(UserAdmin):
                 obj.is_staff = False
                 obj.save()
             self.message_user(request, '将{}个账号变更为学生'.format(queryset.count()), messages.SUCCESS)
-        except:
-            self.message_user(request, '错误：变更失败', messages.ERROR)
+        except Exception as e:
+            self.message_user(request, e.__str__(), messages.ERROR)
     set_student.short_description = '将选中账号设为学生'
 
     actions = [delete_old, set_teacher, set_student]
@@ -57,7 +57,7 @@ class ResumeAdmin(ModelAdmin):
     list_display = (
         '__str__', 
         'name_display', 'id_display', 'email_display', 'phone_display', 
-        'university', 'submitted')
+        'university', 'submitted', 'special_permit')
 
     def name_display(self, obj):
         return (obj.student.last_name or '') + (obj.student.first_name or '')
@@ -74,7 +74,18 @@ class ResumeAdmin(ModelAdmin):
     def phone_display(self, obj):
         return obj.student.phone
     phone_display.short_description = '手机'
-    
+
+    def reject(self, request, queryset: QuerySet):
+        from django.utils.timezone import now
+        try:
+            num = queryset.update(special_permit=True, submitted=False)
+            self.message_user(
+                request, '{}份简历打回成功'.format(num), messages.SUCCESS)
+        except Exception as e:
+            self.message_user(request, e.__str__(), messages.ERROR)
+    reject.short_description = '将选中简历打回修改'
+
+    actions = [reject]
     
 
 

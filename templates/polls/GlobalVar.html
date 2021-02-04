@@ -1,20 +1,37 @@
 <!-- extends表明此页面继承自 base.html 文件 -->
-{% extends "polls/main.html" %}
+{% extends "base2.html" %}
 {% load static %}
 {% block title %}系统配置{% endblock %}
-{% block content %}
+{% block body %}
 <div class="container">
-    <div class="col-md-8 col-md-offset-4">
-        <form class='form-globalvar' action="{% url '' %}" method="post">
-            {% endif %}
+    <div class="col-md-8 col-md-offset-4" style="margin:3rem;">
+        <h3 class="text-center">系统配置</h3>
+        <form class='form-globalvar' action="{% url 'globalvar' %}" method="post">
+        {% if request.user.is_superuser %}
+        <fieldset>
+        {% else %}
+        <fieldset disabled>
+        只有超级管理员有编辑系统配置的权限
+        {% endif %}
             {% csrf_token %}
-            <h3 class="text-center">系统配置</h3>
-             
+            {% for field in globalvar_form %}
+            <div class="form-group">
+                {{ field.errors }}
+                {{ field.label_tag }}
+                {{ field }}
+            </div>
+            {% endfor %}
             <button type="reset" class="btn btn-secondary pull-left">重置</button>
+            <a href="{% url 'index' %}">
+            <button type="button" class="btn btn-secondary">返回</button>
+            </a>
             <button type="submit" class="btn btn-primary">保存</button>
+            </fieldset>
         </form>
     </div>
 </div> <!-- /container -->
+<script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+<script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
 <script>
 onload=function () {
     message = '{{message}}'
@@ -27,7 +44,10 @@ onload=function () {
             toastr.warning(message)
         }
     }
+    $("#id_deadline").datetimepicker( {
+         format:'Y-m-d H:i',
+      });
 };
 </script>
-{% endblock content %}
+{% endblock body %}
 

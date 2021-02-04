@@ -27,8 +27,8 @@ logger = logging.getLogger(__name__)
 #==============================================================================
 
 def index(request):
-    from django.conf import settings
     logger.debug(settings.MEDIA_URL)
+    globalvar = GlobalVar.get()
     return render(request, 'polls/index.html', locals())
 
 User = get_user_model()
@@ -168,12 +168,8 @@ def edit_resume_view(request):
     resume = Resume.objects.get_or_create(student=user, defaults={'student':user})[0]
     logger.debug(resume.__dict__)
     resume_form = forms.ResumeForm(instance=resume)
-    if resume.submitted:
-        logger.debug('Resume submitted: {}'.format(resume.submitted))
-        message = '简历已提交，无法修改'
-        return render(request, template_path, locals())
-    elif check_deadline_pass():
-        message = '截止提交时间已过'
+    disable, message = check_disable_or_not(resume)
+    if disable:
         return render(request, template_path, locals())
     if request.method == "POST":
         resume_form = forms.ResumeForm(request.POST, instance=resume)
@@ -181,7 +177,10 @@ def edit_resume_view(request):
         if resume_form.is_valid():  # 获取数据
             logger.debug(resume_form.cleaned_data)
             try:
-                resume_form.save()
+                resume = resume_form.save(commit=False)
+                if resume.special_permit:
+                    resume.submitted = False
+                resume.save()
                 message = '修改成功'
             except:
                 message = '修改失败'
@@ -193,8 +192,8 @@ def edit_resume_view(request):
 @login_required
 def check_submit_view(request):
     resume = get_object_or_404(Resume, student=request.user.id)
-    is_submitted = resume.submitted
-    errors = check_resume(resume) if not is_submitted else []
+    disable, message = check_disable_or_not(resume)
+    errors = check_resume(resume)
     if not len(errors):
         check_pass = True
         if request.method == 'POST':
@@ -205,8 +204,9 @@ def check_submit_view(request):
                     try:
                         with transaction.atomic():
                             resume.submitted = True
+                            resume.special_permit = False
                             resume.save()
-                        is_submitted = True
+                        disable = True
                         message = '提交成功'
                     except:
                         message = '提交失败'
@@ -216,6 +216,7 @@ def check_submit_view(request):
             confirm_form = forms.ConfirmSubmitForm()
             message = '检验通过'
     else:
+        disable = False
         message = '简历部分字段有误'
         check_pass = False
     return render(request, 'polls/checksubmit.html', locals())
@@ -332,8 +333,22 @@ def teacher_send_mail_view(request):
 
 #------------------------------------------------------------------------------
 #   系统设置视图
+#   设定一些统一的设置，比如截止提交时间，只有管理员有权限
 #------------------------------------------------------------------------------
 
 @staff_member_required(login_url=reverse_lazy('login'))
 def set_globalvar_view(request):
-    pass 
+    if not request.user.is_superuser:
+        raise PermissionDenied
+    globalvar = GlobalVar.get()
+    globalvar_form = forms.GlobalVarForm(initial=globalvar)
+    if request.method == 'POST':
+        globalvar_form = forms.GlobalVarForm(request.POST)
+        message = '修改失败'
+        if globalvar_form.is_valid():
+            try:
+                GlobalVar.set(globalvar_form.cleaned_data)
+                message = '修改成功'
+            except Exception as e:
+                message = e.__str__()
+    return render(request, 'polls/GlobalVar.html', locals())

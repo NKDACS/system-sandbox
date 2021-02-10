@@ -6,7 +6,7 @@ from django.utils.encoding import force_bytes
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.contrib.staticfiles import finders
-from django.core.cache import cache
+from django.core.cache import caches
 import json, datetime
 from django.utils import timezone
 
@@ -72,7 +72,8 @@ class DateTimeEncoder(json.JSONEncoder):
 
 class GlobalVar(object):
     file_path = finders.find('GlobalVar.json')
-    
+    cache = caches['redis']
+
     @staticmethod
     def decode(d:dict):
         if 'deadline' in d.keys():
@@ -110,10 +111,13 @@ class GlobalVar(object):
             pass
         with open(GlobalVar.file_path, 'w', encoding='utf-8') as f:
             if not settings.DEBUG:
-                import fcntl
-                fcntl.flock(f.fileno(), fcntl.LOCK_EX)  # 加锁，其它进程对文件操作则不能成功
-                json.dump(d, f, cls=DateTimeEncoder)
-                fcntl.flock(f.fileno(), fcntl.LOCK_UN)  # 解锁
+                try:
+                    import fcntl
+                    fcntl.flock(f.fileno(), fcntl.LOCK_EX)  # 加锁，其它进程对文件操作则不能成功
+                    json.dump(d, f, cls=DateTimeEncoder)
+                    fcntl.flock(f.fileno(), fcntl.LOCK_UN)  # 解锁
+                except ImportError:
+                    json.dump(d, f, cls=DateTimeEncoder) # 如果没有fcntl可能会脏读
             else:
                 json.dump(d, f, cls=DateTimeEncoder)
 

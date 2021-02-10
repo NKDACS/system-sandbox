@@ -6,7 +6,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.conf import settings
 from django.http import JsonResponse
 from django.views.generic import ListView
-# from django.views.decorators.cache import cache_page
+from django.views.decorators.cache import cache_control, never_cache
+from django.views.decorators.vary import vary_on_cookie
 from django.contrib.auth import get_user_model
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
@@ -26,7 +27,8 @@ logger = logging.getLogger(__name__)
 #==============================================================================
 #   访客视图
 #==============================================================================
-
+@cache_control(max_age=3600)
+@vary_on_cookie
 def index(request):
     logger.debug(settings.MEDIA_URL)
     globalvar = GlobalVar.get()
@@ -36,13 +38,13 @@ User = get_user_model()
 
 
 #==============================================================================
-#   管理视图
+#   用户视图
 #==============================================================================
 
 #------------------------------------------------------------------------------
 #   用户验证相关视图
 #------------------------------------------------------------------------------
-
+@never_cache
 def register(request):
     template_path = 'polls/register.html'
     if request.user.is_authenticated and not settings.DEBUG:
@@ -93,6 +95,7 @@ def register(request):
     return render(request, template_path, locals())
 
 
+@never_cache
 def activate_account_view(request, uidb64, token):
     template_path = 'polls/account_activate_result.html'
     try:
@@ -112,7 +115,7 @@ def activate_account_view(request, uidb64, token):
 #------------------------------------------------------------------------------
 #   修改个人信息相关视图
 #------------------------------------------------------------------------------
-
+@never_cache
 def edit_profile_view(request):
     template_path = 'polls/editprofile.html'
     if not request.user.is_authenticated:
@@ -160,14 +163,15 @@ def edit_profile_view(request):
     return render(request, template_path, locals())
 
 
+@never_cache
 def edit_resume_view(request):
     template_path = 'polls/editresume.html'
     if not request.user.is_authenticated:
         return redirect(reverse('login'))
     user = User.objects.get(id=request.user.id)
     resume = Resume.objects.get_or_create(student=user, defaults={'student':user})[0]
-    logger.debug(resume.__dict__)
     resume_form = forms.ResumeForm(instance=resume)
+    logger.info(resume.__dict__)
     disable, message = check_disable_or_not(resume)
     if disable:
         return render(request, template_path, locals())
@@ -175,12 +179,13 @@ def edit_resume_view(request):
         resume_form = forms.ResumeForm(request.POST, instance=resume)
         message = "未知错误"
         if resume_form.is_valid():  # 获取数据
-            logger.debug(resume_form.cleaned_data)
+            logger.info(resume_form.cleaned_data)
             try:
                 resume = resume_form.save(commit=False)
                 if resume.special_permit:
                     resume.submitted = False
                 resume.save()
+                logger.info(resume.__dict__)
                 resume_result = ResumeResult.objects.get_or_create(resume=resume)[0]
                 resume_result.save()
                 message = '修改成功'
@@ -191,6 +196,7 @@ def edit_resume_view(request):
     return render(request, template_path, locals())
 
 
+@never_cache
 @login_required
 def check_submit_view(request):
     resume = get_object_or_404(Resume, student=request.user.id)
@@ -271,6 +277,7 @@ def detail_anounce_view(request, pk):
     return render(request, 'polls/anounce_detail.html', {'anounce': anounce})
 
 
+@never_cache
 @staff_member_required(login_url=reverse_lazy('login'))
 def edit_anounce_view(request, pk=0):
     template_path = 'polls/anounce_edit.html'
@@ -295,6 +302,7 @@ def edit_anounce_view(request, pk=0):
     return render(request, template_path, locals())
 
 
+@never_cache
 @staff_member_required(login_url=reverse_lazy('login'))
 def delete_anounce_view(request, pk):
     anounce = get_object_or_404(Anoucement, id=pk)
@@ -328,6 +336,7 @@ class StudentListView(ListView):
         return data
 
 
+@never_cache
 @staff_member_required(login_url=reverse_lazy('login'))
 def teacher_send_email_view(request):
     selected = {'to': [str(i.resume.student.id) for i in ResumeResult.objects.filter(
@@ -367,6 +376,7 @@ def teacher_send_email_view(request):
 #------------------------------------------------------------------------------
 
 @staff_member_required(login_url=reverse_lazy('login'))
+@never_cache
 def set_globalvar_view(request):
     if not request.user.is_superuser:
         raise PermissionDenied

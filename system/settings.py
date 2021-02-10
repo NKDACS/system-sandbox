@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = secret.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 PRODUCTION_URL_PREFIX = '/tuimian'
 
 ALLOWED_HOSTS = ['*']
@@ -190,7 +190,7 @@ if not DEBUG:
     MEDIA_URL = PRODUCTION_URL_PREFIX + MEDIA_URL
 
 CACHES = {
-    'default': {
+    'redis': {
         'BACKEND': 'django_redis.cache.RedisCache',
         # url格式 redis://[:password]@host:port/0
         # 可以在url指定redis的密码，0表示低0个数据库
@@ -205,10 +205,15 @@ CACHES = {
     },
     'dummy': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    },
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
     }
 }
-SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 if DEBUG:
     CACHE_MIDDLEWARE_ALIAS = 'dummy'
     SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-
+else:
+    CACHE_MIDDLEWARE_ALIAS = 'default'
+    SESSION_ENGINE = 'django.contrib.sessions.backends.db'

@@ -5,4 +5,5 @@ django-summernote
 redis
 django-redis
 django-redis-cache
+python-memcached
 uwsgi

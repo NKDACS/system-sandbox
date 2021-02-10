@@ -1,3 +1,4 @@
+from django.core.cache.backends.base import InvalidCacheBackendError
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.sites.shortcuts import get_current_site
@@ -72,7 +73,11 @@ class DateTimeEncoder(json.JSONEncoder):
 
 class GlobalVar(object):
     file_path = finders.find('GlobalVar.json')
-    cache = caches['redis']
+    try:
+        cache = caches['redis']
+    except:
+        from django.core.cache import cache
+        cache = cache
 
     @staticmethod
     def decode(d:dict):
@@ -87,7 +92,7 @@ class GlobalVar(object):
         d = json.load(f)
         d = GlobalVar.decode(d)
         try:
-            cache.set('GlobalVar', json.dumps(d, cls=DateTimeEncoder), timeout=None)
+            GlobalVar.cache.set('GlobalVar', json.dumps(d, cls=DateTimeEncoder), timeout=None)
         except:
             pass
         return d
@@ -95,7 +100,7 @@ class GlobalVar(object):
     @staticmethod
     def get():
         try:
-            d = json.loads(cache.get('GlobalVar'))
+            d = json.loads(GlobalVar.cache.get('GlobalVar'))
             d = GlobalVar.decode(d)
             if d is None:
                 d = GlobalVar.get_from_file()
@@ -106,7 +111,8 @@ class GlobalVar(object):
     @staticmethod
     def set(d):
         try:
-            cache.set('GlobalVar', json.dumps(d, cls=DateTimeEncoder), timeout=None)
+            GlobalVar.cache.set('GlobalVar', json.dumps(
+                d, cls=DateTimeEncoder), timeout=None)
         except:
             pass
         with open(GlobalVar.file_path, 'w', encoding='utf-8') as f:

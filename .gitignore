@@ -133,6 +133,6 @@ dmypy.json
 .vscode/
 
 secret.py
-
+media/
 log/
 collectstatic/

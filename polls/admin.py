@@ -3,7 +3,7 @@ from django.contrib.admin.options import ModelAdmin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group, Permission
 from django.db.models.query import QuerySet
-from .models import *
+from .models import MyUser, Resume, ResumeResult, Anoucement, MLModel
 
 
 class MyUserAdmin(UserAdmin):
@@ -123,7 +123,7 @@ class ResumeAdmin(ModelAdmin):
 # 将模型注册到后台
 admin.site.register(MyUser, MyUserAdmin)
 admin.site.register(Resume, ResumeAdmin)
-admin.site.register([Anoucement, ResumeResult])
+admin.site.register([Anoucement, ResumeResult, MLModel])
 
 # 自动建立教师和学生两个用户组
 if not Group.objects.filter(name='teacher').exists():

@@ -46,6 +46,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -53,7 +54,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.cache.FetchFromCacheMiddleware',
 ]
 
@@ -171,18 +171,12 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 SUMMERNOTE_THEME = 'bs4'
 SUMMERNOTE_CONFIG = {
-    'css_for_inplace': (
-        'bootstrap/css/bootstrap.min.css',
-    ),
-    'js_for_inplace': (
-        'jquery.min.js',
-        'bootstrap/js/bootstrap.min.js'
-    ),
     'attachment_absolute_uri': True,
     'width': '100%',
 }
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
+SECURE_CONTENT_TYPE_NOSNIFF = False
 
 if not DEBUG:
     STATIC_URL = PRODUCTION_URL_PREFIX + STATIC_URL
@@ -207,13 +201,13 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     },
     'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': '127.0.0.1:11211',
     }
 }
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 if DEBUG:
     CACHE_MIDDLEWARE_ALIAS = 'dummy'
-    SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 else:
     CACHE_MIDDLEWARE_ALIAS = 'default'
-    SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+    

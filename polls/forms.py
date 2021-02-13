@@ -1,7 +1,7 @@
+from django.forms.fields import ChoiceField
 from django_summernote.fields import SummernoteTextFormField
-from polls.models import Resume, Anoucement
+from polls.models import MLModel, Resume, Anoucement
 from polls import utils
-from django.contrib.auth import get_user_model
 from django import forms
 from captcha.fields import CaptchaField
 from django.contrib.auth.forms import PasswordResetForm
@@ -130,7 +130,7 @@ class SendMultiMailForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        q = choices = get_user_model().objects.annotate(
+        q = choices = User.objects.annotate(
             label=Concat('last_name', 'first_name', V('('), 'person_id', V(')'),
             output_field=CharField())
         ).values('id', 'label')
@@ -140,3 +140,14 @@ class SendMultiMailForm(forms.Form):
             required=True,
             widget=forms.SelectMultiple(attrs={'class': 'form-control'})
         )
+
+
+class SelectModelForm(forms.Form):
+    model = ChoiceField(
+        label='选择模型',
+        choices=MLModel.objects.annotate(
+            human_readable=Concat('name', 'version', output_field=CharField())
+        ).values_list('id', 'human_readable'),
+        widget=forms.Select()
+    )
+

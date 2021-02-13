@@ -1,5 +1,5 @@
-import logging
 import traceback
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.urls.base import reverse, reverse_lazy
 from django.shortcuts import get_object_or_404, redirect, render
@@ -8,7 +8,6 @@ from django.http import JsonResponse
 from django.views.generic import ListView
 from django.views.decorators.cache import cache_control, never_cache
 from django.views.decorators.vary import vary_on_cookie
-from django.contrib.auth import get_user_model
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -18,23 +17,24 @@ from django.core.exceptions import PermissionDenied
 from django.db import DatabaseError, transaction
 from .models import *
 from .utils import *
+from .ml import predict_score, get_error, write_change
 from . import forms
 
-
-logger = logging.getLogger(__name__)
+User = get_user_model()
 
 # Create your views here.
 #==============================================================================
 #   访客视图
 #==============================================================================
-@cache_control(max_age=3600)
+@cache_control(max_age=1800)
 @vary_on_cookie
 def index(request):
+    """
+    首页视图
+    """
     logger.debug(settings.MEDIA_URL)
     globalvar = GlobalVar.get()
     return render(request, 'polls/index.html', locals())
-
-User = get_user_model()
 
 
 #==============================================================================
@@ -46,6 +46,9 @@ User = get_user_model()
 #------------------------------------------------------------------------------
 @never_cache
 def register(request):
+    """
+    注册视图
+    """
     template_path = 'polls/register.html'
     if request.user.is_authenticated and not settings.DEBUG:
         # 登录状态不允许注册
@@ -97,6 +100,9 @@ def register(request):
 
 @never_cache
 def activate_account_view(request, uidb64, token):
+    """
+    激活账号视图
+    """
     template_path = 'polls/account_activate_result.html'
     try:
         uid = force_text(urlsafe_base64_decode(uidb64))
@@ -165,13 +171,18 @@ def edit_profile_view(request):
 
 @never_cache
 def edit_resume_view(request):
+    """
+    编辑简历视图
+    1. 学生是否能编辑：提交或ddl过了无法编辑，但如果有教师打回则可以编辑
+    2. 第一次编辑创建简历对象实例，保存成功则创建ResumeResult对象实例负责保存评分
+    """
     template_path = 'polls/editresume.html'
     if not request.user.is_authenticated:
         return redirect(reverse('login'))
     user = User.objects.get(id=request.user.id)
     resume = Resume.objects.get_or_create(student=user, defaults={'student':user})[0]
     resume_form = forms.ResumeForm(instance=resume)
-    logger.info(resume.__dict__)
+    logger.debug(resume.__dict__)
     disable, message = check_disable_or_not(resume)
     if disable:
         return render(request, template_path, locals())
@@ -179,13 +190,13 @@ def edit_resume_view(request):
         resume_form = forms.ResumeForm(request.POST, instance=resume)
         message = "未知错误"
         if resume_form.is_valid():  # 获取数据
-            logger.info(resume_form.cleaned_data)
+            logger.debug(resume_form.cleaned_data)
             try:
                 resume = resume_form.save(commit=False)
                 if resume.special_permit:
                     resume.submitted = False
                 resume.save()
-                logger.info(resume.__dict__)
+                logger.debug(resume.__dict__)
                 resume_result = ResumeResult.objects.get_or_create(resume=resume)[0]
                 resume_result.save()
                 message = '修改成功'
@@ -199,6 +210,9 @@ def edit_resume_view(request):
 @never_cache
 @login_required
 def check_submit_view(request):
+    """
+    学生简历自动检查和确认提交视图
+    """
     resume = get_object_or_404(Resume, student=request.user.id)
     disable, message = check_disable_or_not(resume)
     errors = check_resume(resume)
@@ -239,6 +253,10 @@ def check_submit_view(request):
 #   增删改查
 #------------------------------------------------------------------------------
 class anounce_list_view(ListView):
+    """
+    所有公告视图，教师（有编辑公告权限）可以看见所有公告，
+    学生只能看到已发布的公告
+    """
     template_name = 'polls/anounce_index.html'
     context_object_name = 'anounce_list'
     paginate_by = 10
@@ -257,7 +275,11 @@ class anounce_list_view(ListView):
         return self.render_to_response(context)
 
 
+@cache_control(max_age=600)
 def latest_anounce_list_view(request, num=-1):
+    """
+    返回最新的五条公告，rest接口，在base.html中用AJAX展示
+    """
     set = Anoucement.objects.filter(
         public_time__lte=timezone.now()).order_by('-public_time').values('id', 'title', 'public_time')
     if num != -1:
@@ -270,7 +292,12 @@ def latest_anounce_list_view(request, num=-1):
         })
     return JsonResponse(data)
 
+
+@cache_control(max_age=600)
 def detail_anounce_view(request, pk):
+    """
+    展示公告详情，需要判断一下是否公开
+    """
     anounce = Anoucement.objects.get(id=pk)
     if anounce.public_time > timezone.now() and not (request.user.is_authenticated and request.user.is_staff):
         raise PermissionDenied
@@ -280,6 +307,9 @@ def detail_anounce_view(request, pk):
 @never_cache
 @staff_member_required(login_url=reverse_lazy('login'))
 def edit_anounce_view(request, pk=0):
+    """
+    编辑公告详情
+    """
     template_path = 'polls/anounce_edit.html'
     if pk:
         anounce = Anoucement.objects.get(id=pk)
@@ -305,6 +335,9 @@ def edit_anounce_view(request, pk=0):
 @never_cache
 @staff_member_required(login_url=reverse_lazy('login'))
 def delete_anounce_view(request, pk):
+    """
+    确认删除公告视图
+    """
     anounce = get_object_or_404(Anoucement, id=pk)
     if request.method == 'POST':
         anounce.delete()
@@ -316,6 +349,10 @@ def delete_anounce_view(request, pk):
 #   学生管理相关视图
 #------------------------------------------------------------------------------
 class StudentListView(ListView):
+    """
+    学生列表视图
+    TODO: 就这里还没写完，需要一个合适的前端模板
+    """
     template_name = 'polls/userlist.html'
     context_object_name = 'user_list'
 
@@ -339,6 +376,9 @@ class StudentListView(ListView):
 @never_cache
 @staff_member_required(login_url=reverse_lazy('login'))
 def teacher_send_email_view(request):
+    """
+    教师群发邮件视图
+    """
     selected = {'to': [str(i.resume.student.id) for i in ResumeResult.objects.filter(
         admiss=True)]} if request.GET.get('admiss') else {}
     email_form = forms.SendMultiMailForm(initial=selected)
@@ -378,6 +418,9 @@ def teacher_send_email_view(request):
 @staff_member_required(login_url=reverse_lazy('login'))
 @never_cache
 def set_globalvar_view(request):
+    """
+    超级管理员设置全局配置视图
+    """
     if not request.user.is_superuser:
         raise PermissionDenied
     globalvar = GlobalVar.get()
@@ -392,3 +435,35 @@ def set_globalvar_view(request):
             except Exception as e:
                 message = e.__str__()
     return render(request, 'polls/GlobalVar.html', locals())
+
+
+#------------------------------------------------------------------------------
+#   系统设置视图
+#   设定一些统一的设置，比如截止提交时间，只有管理员有权限
+#------------------------------------------------------------------------------
+@staff_member_required(login_url=reverse_lazy('login'))
+def run_model_view(request):
+    """
+    选择并运行机器学习评分模型，并显示运行时出现的错误反馈
+    """
+    model_form = forms.SelectModelForm()
+    is_error = False
+    if request.method == 'POST':
+        model_form = forms.SelectModelForm(request.POST)
+        message = '评分失败'
+        is_error = True
+        if model_form.is_valid():
+            try:
+                model = MLModel.objects.get(id=int(model_form.cleaned_data['model']))
+                feedback = predict_score(model.file)
+                write_change(feedback)
+                feedback = get_error(feedback)
+                if len(feedback) > 0:
+                    message = f'{len(feedback)}份简历评分失败'
+                else:
+                    is_error = False
+                    message = '评分成功'
+            except Exception as e:
+                message = e.__str__()
+                traceback.print_exc()
+    return render(request, 'polls/run_model.html', locals())

@@ -1,0 +1,68 @@
+{% extends "base2.html" %}
+{% load static %}
+{% block title %}配置运行模型{% endblock %}
+{% block body %}
+<div class="container">
+    <div class="col-md-8 col-md-offset-4" style="margin:3rem;">
+        <h3 class="text-center">运行评分模型</h3>
+        <form class='form-runmodel' action="{% url 'run_model' %}" method="post">
+            {% csrf_token %}
+            {{ model_form.model.errors }}
+            {{ model_form.model.label_tag }}
+            {{ model_form.model }}
+            <a href="{% url 'index' %}">
+            <button type="button" class="btn btn-secondary">返回</button>
+            </a>
+            <button type="submit" class="btn btn-primary">开始计算！</button>
+        </form>
+        <br />
+        {% if is_error %}
+            模型评分部分失败，以下简历存在问题
+            <table class="table table-sm">
+            <thead>
+                <tr>
+                <th scope="col">ID</th>
+                <th scope="col">姓名</th>
+                <th scope="col">身份证号</th>
+                <th scope="col">错误信息</th>
+                </tr>
+            </thead>
+            <tbody id="feedback">
+                {% for item in feedback %}
+                <tr>
+                <th scope="row">{{ item.id }}</th>
+                <td>{{ item.name }}</td>
+                <td>{{ item.person_id }}</td>
+                <td>{{ item.error }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            </table>
+        {% else %}
+        <h4 class="text-success">全部计算成功！</h4>
+        {% endif %}
+        </div>
+    </div>
+</div> <!-- /container -->
+<script>
+onload=function () {
+    $("#id_model").chosen({
+        allow_single_deselect: false,
+        no_results_text: '没有模型名称包含',
+        placeholder_text_single: '请选择模型',
+        width: "40%"
+    });
+    message = '{{message}}'
+    console.log(message)
+    toastr.options.positionClass = 'toast-top-center';
+    if (message != '') {
+        if (message.indexOf('成功') != -1) {
+            toastr.success(message)
+        } else {
+            toastr.warning(message)
+        }
+    }
+};
+</script>
+{% endblock body %}
+

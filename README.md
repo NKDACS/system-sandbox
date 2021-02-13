@@ -21,6 +21,8 @@ pipenv install -r requirement.txt
 pipenv shell
 ```
 **NOTE**: when debugging on **Windows**, delete `uwsgi` from `requirement.txt`
+### Complete `secret.py`
+create a `secret.py` containing the passwords and secret keys using the template `secret.py.example`
 ### Django Setup
 ```shell
 # create database

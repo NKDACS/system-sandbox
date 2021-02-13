@@ -47,4 +47,5 @@ uwsgi + nginx
 - [ ] redis(seems not working) and cache
 - [ ] UI design and frontend optimization
     (if neccessary, change to Vue.js and restful APIs)
-- [ ] ...
+- [ ] unit test
+...

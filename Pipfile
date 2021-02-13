@@ -9,6 +9,12 @@ django-simple-captcha = "*"
 django-summernote = "*"
 Django = "==3.1.5"
 uWSGI = "*"
+redis = "*"
+django-redis = "*"
+django-redis-cache = "*"
+python-memcached = "*"
+pandas = "*"
+scikit-learn = "*"
 
 [dev-packages]
 

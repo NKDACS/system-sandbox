@@ -32,7 +32,7 @@ def predict_score(model_file: FieldFile) -> pd.DataFrame:
             data.loc[i[0], ['score', 'error']] = score, pd.NA
         except Exception as e:
             data.loc[i[0], ['score', 'error']] = -1.0, e.__str__()
-    data['rank'] = data['score'].rank(method='min', na_option='bottom')
+    data['rank'] = data['score'].rank(method='min', na_option='bottom', ascending=True)
     return data[['score', 'error', 'rank']]
 
 

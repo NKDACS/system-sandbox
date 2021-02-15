@@ -125,22 +125,22 @@ admin.site.register(MyUser, MyUserAdmin)
 admin.site.register(Resume, ResumeAdmin)
 admin.site.register([Anoucement, ResumeResult, MLModel])
 
-# 自动建立教师和学生两个用户组
-if not Group.objects.filter(name='teacher').exists():
-    teacher = Group.objects.create(name='teacher')
-    teacher.permissions.add(
-        Permission.objects.get(codename='polls.view_MyUser'),
-        Permission.object.get(codename='polls.view_Resume'),
-        Permission.object.get(codename='polls.change_Resume'),
-        Permission.object.get(codename='polls.view_Anouncement'),
-        Permission.object.get(codename='polls.add_Anouncement'),
-        Permission.object.get(codename='polls.delete_Anouncement'),
-        Permission.object.get(codename='polls.view_ResumeResult'),
-        Permission.object.get(codename='polls.change_ResumeResult'),
-    )
-    teacher.save()
+# # 自动建立教师和学生两个用户组
+# if not Group.objects.filter(name='teacher').exists():
+#     teacher = Group.objects.create(name='teacher')
+#     teacher.permissions.add(
+#         Permission.objects.get(codename='polls.view_MyUser'),
+#         Permission.object.get(codename='polls.view_Resume'),
+#         Permission.object.get(codename='polls.change_Resume'),
+#         Permission.object.get(codename='polls.view_Anouncement'),
+#         Permission.object.get(codename='polls.add_Anouncement'),
+#         Permission.object.get(codename='polls.delete_Anouncement'),
+#         Permission.object.get(codename='polls.view_ResumeResult'),
+#         Permission.object.get(codename='polls.change_ResumeResult'),
+#     )
+#     teacher.save()
 
-if not Group.objects.filter(name='student').exists():
-    student = Group.objects.create(name='student')
-    student.permissions.set([])
-    student.save()
+# if not Group.objects.filter(name='student').exists():
+#     student = Group.objects.create(name='student')
+#     student.permissions.set([])
+#     student.save()

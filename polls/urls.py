@@ -69,4 +69,5 @@ urlpatterns = [
     path('globalvar/', views.set_globalvar_view, name='globalvar'),
     #群发邮件
     url(r'^teacher_email/$', views.teacher_send_email_view, name='teacher_send_email'),
+    path('model/', views.run_model_view, name='run_model'),
 ]

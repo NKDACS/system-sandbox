@@ -3,8 +3,8 @@
 {% load static %}
 {% block title %}修改公告{% endblock %}
 {% block body %}
-<div class="container d-flex justify-content-between" style="margin:3rem;">
-    <div class="col-md-6" style="width:50%">
+<div class="container">
+    <div class="col-md-10 col-md-offset-4" style="margin:3rem;">
     <form class='form-anounce' action="{% url 'anounce_edit' anounce.id %}" method="post">
         {% csrf_token %}
         {% for field in anounce_form %}
@@ -21,9 +21,8 @@
         <button type="submit" class="btn btn-primary pull-right">保存</button>
     </form>
     </div>
+    <br/><br/>
 </div> <!-- /container -->
-{% comment %} <script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
-<script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script> {% endcomment %}
 <script>
 onload=function () {
     message = '{{message}}'

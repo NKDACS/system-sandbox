@@ -36,9 +36,10 @@
                     href="#" role="button" aria-haspopup="true" aria-expanded="false">管理</a>
                     <div class="dropdown-menu">
                         <a class="dropdown-item" href="{% url 'userlist' %}">考生列表</a>
+                        <a class="dropdown-item" href="{% url 'run_model' %}">模型评分</a>
+                        <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="{% url 'anounce_index' %}">公告管理</a>
                         <a class="dropdown-item" href="{% url 'teacher_send_email' %}">群发邮件</a>
-                        <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="{% url 'globalvar' %}">全局配置</a>
                     </div>
                 </li>

@@ -10,6 +10,10 @@ from django.contrib.staticfiles import finders
 from django.core.cache import caches
 import json, datetime
 from django.utils import timezone
+import logging
+
+# 日志
+logger = logging.getLogger(__name__)
 
 #------------------------------------------------------------------------------
 #   邮件 & 验证码
@@ -75,7 +79,8 @@ class GlobalVar(object):
     file_path = finders.find('GlobalVar.json')
     try:
         cache = caches['redis']
-    except:
+    except Exception as e:
+        logger.warning(e.__str__())
         from django.core.cache import cache
         cache = cache
 
@@ -93,8 +98,8 @@ class GlobalVar(object):
         d = GlobalVar.decode(d)
         try:
             GlobalVar.cache.set('GlobalVar', json.dumps(d, cls=DateTimeEncoder), timeout=None)
-        except:
-            pass
+        except Exception as e:
+            logger.warning(e.__str__())
         return d
     
     @staticmethod
@@ -105,7 +110,8 @@ class GlobalVar(object):
             if d is None:
                 d = GlobalVar.get_from_file()
             return d
-        except:
+        except Exception as e:
+            logger.warning(e.__str__())
             return GlobalVar.get_from_file()
     
     @staticmethod
@@ -113,8 +119,8 @@ class GlobalVar(object):
         try:
             GlobalVar.cache.set('GlobalVar', json.dumps(
                 d, cls=DateTimeEncoder), timeout=None)
-        except:
-            pass
+        except Exception as e:
+            logger.warning(e.__str__())
         with open(GlobalVar.file_path, 'w', encoding='utf-8') as f:
             if not settings.DEBUG:
                 try:
@@ -172,6 +178,9 @@ def check_resume(resume):
 
 
 def check_disable_or_not(resume):
+    """
+    检查该简历是否能编辑的工具函数
+    """
     if resume.special_permit:
         return False, ''
     elif resume.submitted:

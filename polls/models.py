@@ -66,3 +66,15 @@ class ResumeResult(models.Model):
     class Meta:
         verbose_name = '简历评定'
         verbose_name_plural = '简历评定'
+
+
+class MLModel(models.Model):
+    file = models.FileField(upload_to='models/', verbose_name='模型文件', blank=False)
+    name = models.CharField(verbose_name='模型名称', max_length=16, blank=False)
+    version = models.CharField(verbose_name='版本号', max_length=16, blank=True, default='v1.0')
+    # args = models.CharField() Sklearn好像不支持额外参数
+
+    class Meta:
+        verbose_name = '模型'
+        verbose_name_plural = '模型'
+        unique_together = ('name', 'version') # 多字段联合的唯一性约束

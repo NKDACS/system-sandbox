@@ -26,7 +26,7 @@ SECRET_KEY = secret.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 PRODUCTION_URL_PREFIX = '/tuimian'
-
+DEBUG = False
 ALLOWED_HOSTS = ['*']
 
 

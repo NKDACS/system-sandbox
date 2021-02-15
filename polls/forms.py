@@ -1,4 +1,3 @@
-from django.forms.fields import ChoiceField
 from django_summernote.fields import SummernoteTextFormField
 from polls.models import MLModel, Resume, Anoucement
 from polls import utils
@@ -143,11 +142,15 @@ class SendMultiMailForm(forms.Form):
 
 
 class SelectModelForm(forms.Form):
-    model = ChoiceField(
-        label='选择模型',
-        choices=MLModel.objects.annotate(
-            human_readable=Concat('name', 'version', output_field=CharField())
-        ).values_list('id', 'human_readable'),
-        widget=forms.Select()
-    )
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['model'] = forms.ChoiceField(
+            label='选择模型',
+            choices=MLModel.objects.annotate(
+                human_readable=Concat('name', 'version', output_field=CharField())
+            ).values_list('id', 'human_readable'),
+            widget=forms.Select(),
+            required=True
+        )
 

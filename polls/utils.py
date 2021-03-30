@@ -1,4 +1,5 @@
 from django.core.cache.backends.base import InvalidCacheBackendError
+from django.core.exceptions import ValidationError
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.sites.shortcuts import get_current_site
@@ -56,11 +57,11 @@ def IDValidator(value):
     #身份证第十八位可能是X，输入时将小写x转换为大写X
     value = value.upper()
     if len(value) != 18:
-         raise ValueError('请输入18位身份证号码,您只输入了%s位' % len(value))
+         raise ValidationError('请输入18位身份证号码,您只输入了%s位' % len(value))
     for i in range(17):
         sum += int(value[i]) * Wi[i]
     if Ti[sum % 11] != value[17]:
-        raise ValueError('请输入正确的身份证号码')
+        raise ValidationError('请输入正确的身份证号码')
 
 
 #------------------------------------------------------------------------------

@@ -54,8 +54,9 @@
                 {{ register_form.captcha.errors }}
                 {{ register_form.captcha.label_tag }}
                 {{ register_form.captcha }}
+                {% comment %} <button class='js-captcha-refresh'>刷新验证码</button> {% endcomment %}
             </div>
- 
+            
             <button type="reset" class="btn btn-secondary pull-left">重置</button>
             <button type="submit" class="btn btn-primary pull-right">提交</button>
  

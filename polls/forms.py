@@ -29,11 +29,11 @@ class RegisterForm(forms.Form):
         validators=[MinLengthValidator(11, '请输入11位电话号')],
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
-    captcha = CaptchaField(label='验证码')
+    captcha = CaptchaField(label='验证码', error_messages={'invalid': '验证码错误'})
 
 
 class MyPasswordResetForm(PasswordResetForm):
-    captcha = CaptchaField(label='验证码')
+    captcha = CaptchaField(label='验证码', error_messages={'invalid': '验证码错误'})
 
 
 class UserProfileForm(forms.Form):

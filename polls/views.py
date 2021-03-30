@@ -56,7 +56,7 @@ def register(request):
     register_form = forms.RegisterForm()
     if request.method == "POST":
         register_form = forms.RegisterForm(request.POST)
-        message = "验证码错误"
+        message = "未知错误"
         if register_form.is_valid():  # 获取数据
             username = register_form.cleaned_data['username']
             password1 = register_form.cleaned_data['password1']
@@ -95,6 +95,8 @@ def register(request):
                 traceback.print_exc()
                 message = '激活邮件发送失败，请联系管理员'
                 user.delete()
+        else:
+            message = register_form.errors.as_text()
     return render(request, template_path, locals())
 
 

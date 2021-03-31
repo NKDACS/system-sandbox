@@ -23,9 +23,9 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install Dependencies
       run: |
-        apt install -y redis
-        apt install -y memcached
-        apt install -y python${{ matrix.python-version }}-dev
+        sudo apt install -y redis
+        sudo apt install -y memcached
+        sudo apt install -y python${{ matrix.python-version }}-dev
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         echo -e ${{ secrets.SECRETPY }} > secret.py

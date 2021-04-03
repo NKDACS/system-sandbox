@@ -53,14 +53,7 @@ class Resume(models.Model):
     TEACHERS = (
         (0, '王兆军'),
         (1, '刘民千'),
-        (2, '邹长亮'),
-        (3, '周永道'),
-        (4, '杨建峰'),
-        (5, '胡刚'),
-        (6, '徐铣明'),
-        (7, '王磊'),
-        (8, '马志明'),
-        (9, '刘伟')
+        (2, '邹长亮')
     )
     major_choices = models.CharField(verbose_name='研究生报名专业', choices=MAJORS, max_length=16, blank=True)
     tutor = models.CharField(verbose_name='直博生意向导师', choices=TEACHERS,max_length=16, blank=True)

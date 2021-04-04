@@ -1,19 +1,19 @@
 <!-- extends表明此页面继承自 base.html 文件 -->
 {% extends "base2.html" %}
 {% load static %}
-{% block title %}{{anounce}}{% endblock title %}
+{% block title %}{{announce}}{% endblock title %}
 {% block body %}
 <div class="container" style="padding-top:3rem; padding-bottom: 5rem;">
-    <h3>{{anounce.title}}</h3>
-    <p>{{anounce.public_time | date:'Y-m-d H:i:s' }}</p>
+    <h3>{{announce.title}}</h3>
+    <p>{{announce.public_time | date:'Y-m-d H:i:s' }}</p>
     <div class="row" style="margin-bottom:1rem;">
-    {{anounce.content | safe}}
+    {{announce.content | safe}}
     </div>
     {% if request.user.is_staff %}
-    <a href="{% url 'anounce_edit' anounce.id %}">
+    <a href="{% url 'announce_edit' announce.id %}">
     <button type="button" class="btn btn-primary">编辑</button>
     </a>
-    <a href="{% url 'anounce_delete' anounce.id %}">
+    <a href="{% url 'announce_delete' announce.id %}">
     <button type="button" class="btn btn-danger">删除</button>
     </a>
     {% endif %}

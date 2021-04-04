@@ -20,12 +20,12 @@ urlpatterns = [
     path('edit/profile/', views.edit_profile_view, name='editprofile'),
     path('edit/resume/', views.edit_resume_view, name='editresume'),
     path('edit/checksubmit/', views.check_submit_view, name='check_and_submit'),
-    path('anounce/index/', views.anounce_list_view.as_view(), name='anounce_index'),
-    path('anounce/latest/<int:num>/', views.latest_anounce_list_view, name='anounce_list'),
-    path('anounce/<int:pk>/', views.detail_anounce_view, name='anounce_detail'),
-    path('anounce/edit/', views.edit_anounce_view, name='anounce_edit'),
-    path('anounce/edit/<int:pk>/', views.edit_anounce_view, name='anounce_edit'),
-    path('anounce/delete/<int:pk>/', views.delete_anounce_view, name='anounce_delete'),
+    path('announce/index/', views.announce_list_view.as_view(), name='announce_index'),
+    path('announce/latest/<int:num>/', views.latest_announce_list_view, name='announce_list'),
+    path('announce/<int:pk>/', views.detail_announce_view, name='announce_detail'),
+    path('announce/edit/', views.edit_announce_view, name='announce_edit'),
+    path('announce/edit/<int:pk>/', views.edit_announce_view, name='announce_edit'),
+    path('announce/delete/<int:pk>/', views.delete_announce_view, name='announce_delete'),
     #密码重置链接
     url(
         r'^password_reset/$', 

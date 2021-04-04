@@ -22,10 +22,11 @@ from . import forms
 
 User = get_user_model()
 
+
 # Create your views here.
-#==============================================================================
+# ==============================================================================
 #   访客视图
-#==============================================================================
+# ==============================================================================
 @cache_control(max_age=1800)
 @vary_on_cookie
 def index(request):
@@ -37,13 +38,13 @@ def index(request):
     return render(request, 'polls/index.html', locals())
 
 
-#==============================================================================
+# ==============================================================================
 #   用户视图
-#==============================================================================
+# ==============================================================================
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #   用户验证相关视图
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 @never_cache
 def register(request):
     """
@@ -84,7 +85,7 @@ def register(request):
                 first_name=register_form.cleaned_data['first_name'],
                 last_name=register_form.cleaned_data['last_name'],
                 person_id=person_id,
-                is_active=False # 默认未激活
+                is_active=False  # 默认未激活
             )
             user.set_password(password1)
             try:
@@ -120,9 +121,9 @@ def activate_account_view(request, uidb64, token):
         return render(request, template_path, {'message': False})
 
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #   修改个人信息相关视图
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 @never_cache
 def edit_profile_view(request):
     template_path = 'polls/editprofile.html'
@@ -182,7 +183,7 @@ def edit_resume_view(request):
     if not request.user.is_authenticated:
         return redirect(reverse('login'))
     user = User.objects.get(id=request.user.id)
-    resume = Resume.objects.get_or_create(student=user, defaults={'student':user})[0]
+    resume = Resume.objects.get_or_create(student=user, defaults={'student': user})[0]
     resume_form = forms.ResumeForm(instance=resume)
     logger.debug(resume.__dict__)
     disable, message = check_disable_or_not(resume)
@@ -203,7 +204,7 @@ def edit_resume_view(request):
                 resume_result.save()
                 message = '修改成功'
             except Exception as e:
-                message = '修改失败'+e.__str__()
+                message = '修改失败' + e.__str__()
         else:
             message = resume_form.errors.as_text()
     return render(request, template_path, locals())
@@ -246,28 +247,28 @@ def check_submit_view(request):
     return render(request, 'polls/checksubmit.html', locals())
 
 
-#==============================================================================
+# ==============================================================================
 #   管理视图
-#==============================================================================
+# ==============================================================================
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #   公告相关视图
 #   增删改查
-#------------------------------------------------------------------------------
-class anounce_list_view(ListView):
+# ------------------------------------------------------------------------------
+class announce_list_view(ListView):
     """
     所有公告视图，教师（有编辑公告权限）可以看见所有公告，
     学生只能看到已发布的公告
     """
-    template_name = 'polls/anounce_index.html'
-    context_object_name = 'anounce_list'
+    template_name = 'polls/announce_index.html'
+    context_object_name = 'announce_list'
     paginate_by = 10
 
     def get_queryset(self, request):
         if request.user.is_staff:
-            return Anoucement.objects.order_by('-public_time')
+            return Announcement.objects.order_by('-public_time')
         else:
-            return Anoucement.objects.filter(public_time__lte=timezone.now()).order_by('-public_time')
+            return Announcement.objects.filter(public_time__lte=timezone.now()).order_by('-public_time')
 
     def get(self, request, *args, **kwargs):
         # if not request.user.is_authenticated:
@@ -278,78 +279,78 @@ class anounce_list_view(ListView):
 
 
 @cache_control(max_age=600)
-def latest_anounce_list_view(request, num=-1):
+def latest_announce_list_view(request, num=-1):
     """
     返回最新的五条公告，rest接口，在base.html中用AJAX展示
     """
-    set = Anoucement.objects.filter(
+    set = Announcement.objects.filter(
         public_time__lte=timezone.now()).order_by('-public_time').values('id', 'title', 'public_time')
     if num != -1:
         set = set[:num]
     data = {'list': []}
     for i in set:
         data['list'].append({
-            'id': i['id'], 'title': i['title'], 
+            'id': i['id'], 'title': i['title'],
             'public_time': i['public_time'].strftime("%Y-%m-%d")
         })
     return JsonResponse(data)
 
 
 @cache_control(max_age=600)
-def detail_anounce_view(request, pk):
+def detail_announce_view(request, pk):
     """
     展示公告详情，需要判断一下是否公开
     """
-    anounce = Anoucement.objects.get(id=pk)
-    if anounce.public_time > timezone.now() and not (request.user.is_authenticated and request.user.is_staff):
+    announce = Announcement.objects.get(id=pk)
+    if announce.public_time > timezone.now() and not (request.user.is_authenticated and request.user.is_staff):
         raise PermissionDenied
-    return render(request, 'polls/anounce_detail.html', {'anounce': anounce})
+    return render(request, 'polls/announce_detail.html', {'announce': announce})
 
 
 @never_cache
 @staff_member_required(login_url=reverse_lazy('login'))
-def edit_anounce_view(request, pk=0):
+def edit_announce_view(request, pk=0):
     """
     编辑公告详情
     """
-    template_path = 'polls/anounce_edit.html'
+    template_path = 'polls/announce_edit.html'
     if pk:
-        anounce = Anoucement.objects.get(id=pk)
+        announce = Announcement.objects.get(id=pk)
     else:
-        anounce = Anoucement.objects.create()
-    anounce_form = forms.AnouncementForm(instance=anounce)
+        announce = Announcement.objects.create()
+    announce_form = forms.AnnouncementForm(instance=announce)
     if request.method == 'POST':
-        anounce_form = forms.AnouncementForm(request.POST, instance=anounce)
+        announce_form = forms.AnnouncementForm(request.POST, instance=announce)
         message = "未知错误"
-        if anounce_form.is_valid():
-            logger.debug(anounce_form.cleaned_data)
+        if announce_form.is_valid():
+            logger.debug(announce_form.cleaned_data)
             try:
                 with transaction.atomic():
-                    anounce_form.save()
+                    announce_form.save()
                 message = '修改成功'
             except:
                 message = '修改失败'
         else:
-            message = anounce_form.errors.as_text()
+            message = announce_form.errors.as_text()
     return render(request, template_path, locals())
 
 
 @never_cache
 @staff_member_required(login_url=reverse_lazy('login'))
-def delete_anounce_view(request, pk):
+def delete_announce_view(request, pk):
     """
     确认删除公告视图
     """
-    anounce = get_object_or_404(Anoucement, id=pk)
+    announce = get_object_or_404(Announcement, id=pk)
     if request.method == 'POST':
-        anounce.delete()
-        return redirect(reverse('anounce_index'))
-    return render(request, 'polls/anounce_delete.html', {'anounce': anounce})
+        announce.delete()
+        return redirect(reverse('announce_index'))
+    return render(request, 'polls/announce_delete.html', {'announce': announce})
 
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #   学生管理相关视图
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class StudentListView(ListView):
     """
     学生列表视图
@@ -401,7 +402,7 @@ def teacher_send_email_view(request):
                     to=[i['email'] for i in to_user.values('email')],
                 )
                 for f in files:
-                    if f.size > 1024*1024*49:
+                    if f.size > 1024 * 1024 * 49:
                         raise Exception('超过50M的文件无法通过附件发送')
                     email.attach(f._name, f.read())
                 email.send()
@@ -412,10 +413,10 @@ def teacher_send_email_view(request):
     return render(request, 'polls/teacher_send_email.html', locals())
 
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #   系统设置视图
 #   设定一些统一的设置，比如截止提交时间，只有管理员有权限
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 @staff_member_required(login_url=reverse_lazy('login'))
 @never_cache
@@ -439,10 +440,10 @@ def set_globalvar_view(request):
     return render(request, 'polls/GlobalVar.html', locals())
 
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #   系统设置视图
 #   设定一些统一的设置，比如截止提交时间，只有管理员有权限
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 @staff_member_required(login_url=reverse_lazy('login'))
 def run_model_view(request):
     """

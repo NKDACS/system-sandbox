@@ -12,11 +12,11 @@
                 <span>发布时间</strong></span>
             </div>
         </a>
-    {% for anounce in page_obj %}
-        <a href="{% url 'anounce_detail' anounce.id %}" class="list-group-item list-group-item-action">
+    {% for announce in page_obj %}
+        <a href="{% url 'announce_detail' announce.id %}" class="list-group-item list-group-item-action">
             <div class="d-flex w-100 justify-content-between">
-                <span class="mb-1">{{ anounce.title | safe }}</span>
-                <small>{{anounce.public_time}}</small>
+                <span class="mb-1">{{ announce.title | safe }}</span>
+                <small>{{announce.public_time}}</small>
             </div>
         </a>
     {% endfor %}
@@ -52,7 +52,7 @@
         <li class="page-item"><a class="page-link" href="?page={{page_obj.paginator.num_pages}}">尾页</a></li>
     </ul>
     <div class="row">
-    <a href="{% url 'anounce_edit' 0 %}">
+    <a href="{% url 'announce_edit' 0 %}">
     <button type="button" class="btn btn-primary">新建公告</button>
     </a>
     </b>

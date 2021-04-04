@@ -5,9 +5,9 @@
 {% block body %}
 <div class="container">
     <div class="col-md-10 col-md-offset-4" style="margin:3rem;">
-    <form class='form-anounce' action="{% url 'anounce_edit' anounce.id %}" method="post">
+    <form class='form-announce' action="{% url 'announce_edit' announce.id %}" method="post">
         {% csrf_token %}
-        {% for field in anounce_form %}
+        {% for field in announce_form %}
         <div class="form-group">
             {{ field.errors }}
             {{ field.label_tag }}
@@ -15,7 +15,7 @@
         </div> 
         {% endfor %}
         <button type="reset" class="btn btn-light pull-left">重置</button>
-        <a href="{% url 'anounce_index' %}">
+        <a href="{% url 'announce_index' %}">
         <button type="button" class="btn btn-secondary">返回</button>
         </a>
         <button type="submit" class="btn btn-primary pull-right">保存</button>

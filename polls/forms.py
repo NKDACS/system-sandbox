@@ -1,5 +1,5 @@
 from django_summernote.fields import SummernoteTextFormField
-from polls.models import MLModel, Resume, Announcement
+from polls.models import MLModel, Resume, Anoucement
 from polls import utils
 from django import forms
 from captcha.fields import CaptchaField
@@ -63,32 +63,27 @@ class UserProfileForm(forms.Form):
 class ResumeForm(forms.ModelForm):
     class Meta:
         model = Resume
-        fields = [
-            'aspiration', 'major_choices', 'tutor',
+        fields = [ 
             'university', 'school', 'major', 'gpa',
             'rank', 'major_student_amount', 'cet6',
-            'cet6_grades', 'other_prize_penalty', 'others',
+            'other_prize_penalty', 'others',
         ]
         widgets = {
-            'aspiration': forms.Select(attrs={'class': 'form-control'}),
-            'major_choices': forms.Select(attrs={'class': 'form-control'}),
-            'tutor': forms.Select(attrs={'class': 'form-control'}),
             'university': forms.Select(attrs={'class': 'form-control'}),
             'school': forms.TextInput(attrs={'class': 'form-control'}),
             'major': forms.TextInput(attrs={'class': 'form-control'}),
             'gpa': forms.NumberInput(attrs={'class': 'form-control'}),
             'rank': forms.NumberInput(attrs={'class': 'form-control'}),
-            'major_student_amount': forms.NumberInput(attrs={'class': 'form-control'}),
+            'major_student_amout': forms.NumberInput(attrs={'class': 'form-control'}),
             'cet6': forms.CheckboxInput(attrs={'class': 'form-check-input', 'style': 'margin-left:1rem;'}),
-            'cet6_grades': forms.NumberInput(attrs={'class': 'form-control'}),
             'other_prize_penalty': forms.Textarea(attrs={'class': 'form-control', 'rows': '3', 'maxlength':'1000'}),
             'others': forms.Textarea(attrs={'class': 'form-control', 'rows': '3', 'maxlength': '1000'}),
         }
 
 
-class AnnouncementForm(forms.ModelForm):
+class AnouncementForm(forms.ModelForm):
     class Meta:
-        model = Announcement
+        model = Anoucement
         fields = ['title', 'content', 'public_time']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),

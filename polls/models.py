@@ -22,7 +22,7 @@ class MyUser(AbstractUser):
         return reverse('login')
 
 
-class Anoucement(models.Model):
+class Announcement(models.Model):
     title = models.CharField(verbose_name='标题', max_length=32)
     content = SummernoteTextField(verbose_name='内容', null=True)
     # create_timestamp = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
@@ -40,13 +40,38 @@ class Anoucement(models.Model):
 
 class Resume(models.Model):
     student = models.OneToOneField(AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='学生账号')
+    ASPIRATIONS = (
+        (0, '专硕'),
+        (1, '学硕'),
+        (2, '直博')
+    )
+    aspiration = models.CharField(verbose_name='志愿', choices=ASPIRATIONS, max_length=16, blank=True)
+    MAJORS = (
+        (0, '统计学'),
+        (1, '应用统计')
+    )
+    TEACHERS = (
+        (0, '王兆军'),
+        (1, '刘民千'),
+        (2, '邹长亮'),
+        (3, '周永道'),
+        (4, '杨建峰'),
+        (5, '胡刚'),
+        (6, '徐铣明'),
+        (7, '王磊'),
+        (8, '马志明'),
+        (9, '刘伟')
+    )
+    major_choices = models.CharField(verbose_name='研究生报名专业', choices=MAJORS, max_length=16, blank=True)
+    tutor = models.CharField(verbose_name='直博生意向导师', choices=TEACHERS,max_length=16, blank=True)
     university = models.CharField(verbose_name='学校', choices=utils.UNIVERSITY, max_length=16, blank=True)
     school = models.CharField(verbose_name='学院', max_length=16, blank=True)
     major = models.CharField(verbose_name='本科主修专业', max_length=16, blank=True)
     gpa = models.FloatField(verbose_name='平均学分绩', null=True, blank=True)
     rank = models.PositiveSmallIntegerField(verbose_name='本科专业内学分绩排名', null=True, blank=True)
     major_student_amount = models.PositiveIntegerField(verbose_name='本科专业总人数', null=True, blank=True)
-    cet6 = models.BooleanField(verbose_name='通过CET6', default=False)
+    cet6 = models.BooleanField(verbose_name='是否通过cet6', default=False, blank=False)
+    cet6_grades = models.FloatField(verbose_name='CET6成绩', null=True, blank=True)
     other_prize_penalty = models.TextField(verbose_name='其他奖励惩罚', max_length=1024, blank=True)
     others = models.TextField(verbose_name='备注', max_length=1024, blank=True)
     submitted = models.BooleanField(verbose_name='是否已提交', default=False, blank=False)

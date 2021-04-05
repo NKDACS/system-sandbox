@@ -162,6 +162,7 @@ def check_resume(resume):
             (lambda x: x.major_student_amount < x.rank, '小于个人排名')
         ],
         'gpa': [(lambda x: x.gpa>100, '大于100')]
+        'cet6_score': [(lambda x: x.cet6_score > 710, '大于710')]
     }
     for f in resume._meta.fields:
         if f.name in validator.keys():

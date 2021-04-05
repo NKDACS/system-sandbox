@@ -134,6 +134,16 @@ class GlobalVar(object):
             else:
                 json.dump(d, f, cls=DateTimeEncoder)
 
+def get_tutor():
+    result = finders.find('GlobalVar.json')
+    file = open(result, 'r', encoding='utf-8')
+    d = json.load(file)
+    mentor = []
+    for i in d['mentor']:
+        mentor.append(i)
+    return mentor
+
+TUTOR = get_tutor()
 
 #------------------------------------------------------------------------------
 #   简历验证相关
@@ -161,7 +171,8 @@ def check_resume(resume):
             (lambda x: x.major_student_amount == 0, '为0'),
             (lambda x: x.major_student_amount < x.rank, '小于个人排名')
         ],
-        'gpa': [(lambda x: x.gpa>100, '大于100')]
+        'gpa': [(lambda x: x.gpa>100, '大于100')],
+        'cet6_grades': [(lambda x: x.cet6_grades>710, '大于710')]
     }
     for f in resume._meta.fields:
         if f.name in validator.keys():

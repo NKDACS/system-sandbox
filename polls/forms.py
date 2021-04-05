@@ -114,6 +114,10 @@ class GlobalVarForm(forms.Form):
         label='问题反馈邮箱', required=True,
         widget=forms.TextInput()
     )
+    mentor = forms.CharField(
+        label='导师名单', required=True,
+        widget=forms.TextInput()
+    )
 
 
 class SendMultiMailForm(forms.Form):

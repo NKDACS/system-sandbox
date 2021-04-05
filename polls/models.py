@@ -50,20 +50,8 @@ class Resume(models.Model):
         (0, '统计学'),
         (1, '应用统计')
     )
-    TEACHERS = (
-        (0, '王兆军'),
-        (1, '刘民千'),
-        (2, '邹长亮'),
-        (3, '周永道'),
-        (4, '杨建峰'),
-        (5, '胡刚'),
-        (6, '徐铣明'),
-        (7, '王磊'),
-        (8, '马志明'),
-        (9, '刘伟')
-    )
     major_choices = models.CharField(verbose_name='研究生报名专业', choices=MAJORS, max_length=16, blank=True)
-    tutor = models.CharField(verbose_name='直博生意向导师', choices=TEACHERS,max_length=16, blank=True)
+    tutor = models.CharField(verbose_name='直博生意向导师', choices=utils.TUTOR, max_length=16, blank=True)
     university = models.CharField(verbose_name='学校', choices=utils.UNIVERSITY, max_length=16, blank=True)
     school = models.CharField(verbose_name='学院', max_length=16, blank=True)
     major = models.CharField(verbose_name='本科主修专业', max_length=16, blank=True)

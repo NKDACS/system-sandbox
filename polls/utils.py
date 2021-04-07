@@ -133,17 +133,14 @@ class GlobalVar(object):
                     json.dump(d, f, cls=DateTimeEncoder) # 如果没有fcntl可能会脏读
             else:
                 json.dump(d, f, cls=DateTimeEncoder)
-
-def get_tutor():
-    result = finders.find('GlobalVar.json')
-    file = open(result, 'r', encoding='utf-8')
-    d = json.load(file)
-    mentor = []
-    for i in d['mentor']:
-        mentor.append(i)
-    return mentor
-
-TUTOR = get_tutor()
+#     def get_tutor( ):
+#         dic = get()
+#         mentor = []
+#         for i in dic['mentor']:
+#             mentor.append(i)
+#         return mentor
+#
+# TUTOR = get_tutor()
 
 #------------------------------------------------------------------------------
 #   简历验证相关
@@ -166,13 +163,17 @@ def check_resume(resume):
     """
     errors = []
     validator = {
+        'tutor': [(lambda x: x.tutor == '', '为空')],
         'university': [(lambda x: x.university == '', '为空')],
         'major_student_amount': [
             (lambda x: x.major_student_amount == 0, '为0'),
             (lambda x: x.major_student_amount < x.rank, '小于个人排名')
         ],
         'gpa': [(lambda x: x.gpa>100, '大于100')],
-        'cet6_grades': [(lambda x: x.cet6_grades>710, '大于710')]
+        'cet6_grades': [(lambda x: x.cet6_grades > 710, '大于710'),
+                        (lambda x: x.cet6_grades < 220, '小于220'),
+                        (lambda x: x.cet6_grades == '', '为空')
+                        ]
     }
     for f in resume._meta.fields:
         if f.name in validator.keys():

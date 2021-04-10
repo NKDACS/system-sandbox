@@ -52,6 +52,18 @@ class Resume(models.Model):
     submitted = models.BooleanField(verbose_name='是否已提交', default=False, blank=False)
     special_permit = models.BooleanField(verbose_name='是否打回修改', default=False, blank=False)
 
+    TYPE_CHOICES = (
+        (u'Master', u'硕士'),
+        (u'DDS', u'直博生'),
+    )
+    MAJOR_CHOICES = (
+        (u'统计学', u'统计学'),
+        (u'应用统计', u'应用统计'),
+    )
+    enrollment_type = models.CharField(verbose_name='招生类型', default='', choices=TYPE_CHOICES, max_length=6)
+    enrollment_major = models.CharField(verbose_name='报考专业', default='', choices=MAJOR_CHOICES, max_length=10)
+    enrollment_tutor = models.CharField(verbose_name='意向导师', max_length=20, blank=True)
+
     class Meta:
         verbose_name = '简历'
         verbose_name_plural = '简历'

@@ -65,8 +65,8 @@ class ResumeForm(forms.ModelForm):
         model = Resume
         fields = [ 
             'university', 'school', 'major', 'gpa','rank', 
-            'major_student_amount','intentional_major', 'intentional_tutor',
-            'cet6', 'cet6_score', 'other_prize_penalty', 'others',
+            'major_student_amount',
+            'cet6', 'other_prize_penalty', 'others', 'enrollment_type','enrollment_major','enrollment_tutor'
         ]
         widgets = {
             'university': forms.Select(attrs={'class': 'form-control'}),
@@ -76,9 +76,13 @@ class ResumeForm(forms.ModelForm):
             'rank': forms.NumberInput(attrs={'class': 'form-control'}),
             'major_student_amout': forms.NumberInput(attrs={'class': 'form-control'}),
             'cet6': forms.CheckboxInput(attrs={'class': 'form-check-input', 'style': 'margin-left:1rem;'}),
-            'cet6_score': forms.NumberInput(attrs={'class': 'form-control'}),
+            #'cet6_score': forms.NumberInput(attrs={'class': 'form-control'}),
             'other_prize_penalty': forms.Textarea(attrs={'class': 'form-control', 'rows': '3', 'maxlength':'1000'}),
             'others': forms.Textarea(attrs={'class': 'form-control', 'rows': '3', 'maxlength': '1000'}),
+            'enrollment_type': forms.Select(attrs={'class': 'form-control', 'style': 'width:30%'}),
+            'enrollment_major': forms.Select(attrs={'class': 'form-control', 'style': 'width:30%'}),
+            'enrollment_major': forms.Select(attrs={'class': 'form-control', 'style': 'width:30%'}),
+            'enrollment_tutor': forms.TextInput(attrs={'class': 'form-control', 'style': 'width:50%'}),
         }
 
 

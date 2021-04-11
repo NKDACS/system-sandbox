@@ -38,8 +38,29 @@
     </div>
     </div>
 </div> <!-- /container -->
+<script src="{% static 'jquery.min.js' %}"></script>
 <script>
+$(function(){
+    $("#id_enrollment_tutor").hide();
+    $("label[for=id_enrollment_tutor]").hide();
+})
+$('#id_enrollment_type').change(function(){
+    if ( $("#id_enrollment_type").val()== 'Master'){
+        $("#id_enrollment_tutor").hide();
+        $("label[for=id_enrollment_tutor]").hide();
+        $("#id_enrollment_major option").remove();
+        $("#id_enrollment_major").append("<option value='统计学'>统计学</option>");
+        $("#id_enrollment_major").append("<option value='应用统计'>应用统计</option>");
+    }else {
+        $("#id_enrollment_tutor").show();
+        $("label[for=id_enrollment_tutor]").show();
+        $("#id_enrollment_major option").remove();
+        $("#id_enrollment_major").append("<option value='统计学'>统计学</option>");
+    }
+})
+
 onload=function () {
+
     $("#id_university").chosen({
         allow_single_deselect: false,
         no_results_text: '没有学校或地区包含',
@@ -58,5 +79,5 @@ onload=function () {
     }
 };
 </script>
-{% endblock content %}
 
+{% endblock content %}

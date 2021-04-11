@@ -209,4 +209,3 @@ if DEBUG:
     CACHE_MIDDLEWARE_ALIAS = 'dummy'
 else:
     CACHE_MIDDLEWARE_ALIAS = 'default'
-    

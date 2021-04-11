@@ -7,10 +7,11 @@ from django.urls import reverse
 from django.utils import timezone
 from django_summernote.fields import SummernoteTextField
 
+
 class MyUser(AbstractUser):
     number = models.PositiveIntegerField(verbose_name='工号', name='number', blank=True, null=True)
-    phone = models.CharField(verbose_name='电话', name='phone', blank=True, max_length=11, 
-        validators=[MinLengthValidator(11, '请输入11位有效电话')])
+    phone = models.CharField(verbose_name='电话', name='phone', blank=True, max_length=11,
+                             validators=[MinLengthValidator(11, '请输入11位有效电话')])
     person_id = models.CharField(
         verbose_name='身份证号', max_length=18,
         unique=True, blank=True, null=True,
@@ -18,11 +19,12 @@ class MyUser(AbstractUser):
     )
     first_name = models.CharField(verbose_name='名字', max_length=32)
     last_name = models.CharField(verbose_name='姓氏', max_length=32)
+
     def get_absolute_url(self):
         return reverse('login')
 
 
-class Anoucement(models.Model):
+class Announcement(models.Model):
     title = models.CharField(verbose_name='标题', max_length=32)
     content = SummernoteTextField(verbose_name='内容', null=True)
     # create_timestamp = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
@@ -46,11 +48,24 @@ class Resume(models.Model):
     gpa = models.FloatField(verbose_name='平均学分绩', null=True, blank=True)
     rank = models.PositiveSmallIntegerField(verbose_name='本科专业内学分绩排名', null=True, blank=True)
     major_student_amount = models.PositiveIntegerField(verbose_name='本科专业总人数', null=True, blank=True)
-    cet6 = models.BooleanField(verbose_name='通过CET6', default=False)
-    other_prize_penalty = models.TextField(verbose_name='其他奖励惩罚', max_length=1024, blank=True)
-    others = models.TextField(verbose_name='备注', max_length=1024, blank=True)
+    cet6 = models.BooleanField(verbose_name='通过cet6', default=False, blank=False)
+    cet6_score = models.FloatField(verbose_name='CET6成绩(未通过填0)', null=True, blank=True)
+    other_prize_penalty = models.TextField(verbose_name='与数学或建模相关奖项', max_length=1024, blank=True)
+    others = models.TextField(verbose_name='其他获奖（包括奖学金）', max_length=1024, blank=True)
+    addition = models.TextField(verbose_name='其他补充说明', max_length=1024, blank=True)
     submitted = models.BooleanField(verbose_name='是否已提交', default=False, blank=False)
     special_permit = models.BooleanField(verbose_name='是否打回修改', default=False, blank=False)
+    TYPE_CHOICES = (
+        (u'Master', u'硕士'),
+        (u'DDS', u'直博生'),
+    )
+    MAJOR_CHOICES = (
+        (u'统计学', u'统计学'),
+        (u'应用统计', u'应用统计'),
+    )
+    enrollment_type = models.CharField(verbose_name='招生类型', default='', choices=TYPE_CHOICES, max_length=6)
+    enrollment_major = models.CharField(verbose_name='报考专业', default='', choices=MAJOR_CHOICES, max_length=10)
+    enrollment_tutor = models.CharField(verbose_name='意向导师', max_length=20, blank=True)
 
     class Meta:
         verbose_name = '简历'
@@ -72,9 +87,10 @@ class MLModel(models.Model):
     file = models.FileField(upload_to='models/', verbose_name='模型文件', blank=False)
     name = models.CharField(verbose_name='模型名称', max_length=16, blank=False)
     version = models.CharField(verbose_name='版本号', max_length=16, blank=True, default='v1.0')
+
     # args = models.CharField() Sklearn好像不支持额外参数
 
     class Meta:
         verbose_name = '模型'
         verbose_name_plural = '模型'
-        unique_together = ('name', 'version') # 多字段联合的唯一性约束
+        unique_together = ('name', 'version')  # 多字段联合的唯一性约束

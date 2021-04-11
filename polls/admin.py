@@ -3,7 +3,7 @@ from django.contrib.admin.options import ModelAdmin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group, Permission
 from django.db.models.query import QuerySet
-from .models import MyUser, Resume, ResumeResult, Anoucement, MLModel
+from .models import MyUser, Resume, ResumeResult, Announcement, MLModel
 
 
 class MyUserAdmin(UserAdmin):
@@ -36,9 +36,9 @@ class MyUserAdmin(UserAdmin):
                 Permission.objects.get(codename='polls.view_MyUser'),
                 Permission.object.get(codename='polls.view_Resume'),
                 Permission.object.get(codename='polls.change_Resume'),
-                Permission.object.get(codename='polls.view_Anouncement'),
-                Permission.object.get(codename='polls.add_Anouncement'),
-                Permission.object.get(codename='polls.delete_Anouncement'),
+                Permission.object.get(codename='polls.view_Announcement'),
+                Permission.object.get(codename='polls.add_Announcement'),
+                Permission.object.get(codename='polls.delete_Announcement'),
                 Permission.object.get(codename='polls.view_ResumeResult'),
                 Permission.object.get(codename='polls.change_ResumeResult'),
             )
@@ -141,4 +141,4 @@ class ResumeAdmin(ModelAdmin):
 # 将模型注册到后台
 admin.site.register(MyUser, MyUserAdmin)
 admin.site.register(Resume, ResumeAdmin)
-admin.site.register([Anoucement, ResumeResult, MLModel])
+admin.site.register([Announcement, ResumeResult, MLModel])

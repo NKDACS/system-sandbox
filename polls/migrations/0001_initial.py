@@ -48,7 +48,7 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='Anoucement',
+            name='Announcement',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('title', models.CharField(max_length=32, verbose_name='标题')),
@@ -112,7 +112,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.AddIndex(
-            model_name='anoucement',
+            model_name='announcement',
             index=models.Index(fields=['-public_time'], name='polls_anouc_public__572fbb_idx'),
         ),
         migrations.AddField(

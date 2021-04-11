@@ -50,10 +50,10 @@ DDDDDDDDDDD                                                          DDDDDDDDDDD
     @NKDACS 2021
     Left blank here for co-authors`, 'color: #6cf')
             jQuery.datetimepicker.setLocale('zh');
-            $.get("{% url 'anounce_list' 5 %}", {}, function(resp){
+            $.get("{% url 'announce_list' 5 %}", {}, function(resp){
                 for(var k=0;k<resp['list'].length;k++){
                     i = resp['list'][k]
-                    href = "{% url 'anounce_detail' '1' %}"
+                    href = "{% url 'announce_detail' '1' %}"
                     href = href.slice(0,href.length-2)
                     href += i['id']
                     // console.log(i)
@@ -61,7 +61,7 @@ DDDDDDDDDDD                                                          DDDDDDDDDDD
                         + ' style="padding: 0.5rem;">'
                         + '<div class="d-flex w-100 justify-content-between"><span class="mb-1">'
                         + i['title'] + '</span> <small>' + i['public_time'] + '</small></div></a>'
-                    $(".anounce_list").append(j)
+                    $(".announce_list").append(j)
                 }
             })
         })

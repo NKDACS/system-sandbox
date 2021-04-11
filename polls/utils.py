@@ -1,28 +1,31 @@
-from django.core.cache.backends.base import InvalidCacheBackendError
-from django.core.exceptions import ValidationError
-from django.utils.http import urlsafe_base64_encode
+import datetime
+import json
+import logging
+
+from django.conf import settings
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.sites.shortcuts import get_current_site
-from django.conf import settings
-from django.utils.encoding import force_bytes
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
 from django.contrib.staticfiles import finders
 from django.core.cache import caches
-import json, datetime
+from django.core.exceptions import ValidationError
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
 from django.utils import timezone
-import logging
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 
 # 日志
 logger = logging.getLogger(__name__)
 
-#------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 #   邮件 & 验证码
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 class TokenGenerator(PasswordResetTokenGenerator):
     def _make_hash_value(self, user, timestamp):
-        return (str(user.pk) + str(timestamp) + str(user.is_active))
+        return str(user.pk) + str(timestamp) + str(user.is_active)
+
 
 account_activation_token = TokenGenerator()
 
@@ -32,41 +35,43 @@ def send_activate_email(request, user):
         'first': user.first_name,
         'last': user.last_name,
         'user': user.username,
-        'domain': get_current_site(request) .domain,
+        'domain': get_current_site(request).domain,
         'uid': urlsafe_base64_encode(force_bytes(user.id)),
         'token': account_activation_token.make_token(user),
     })
     send_mail(
-        '激活账号 - 南开大学统计与数据科学学院研究生推免报名系统', 
-        mail_content, 
-        settings.EMAIL_HOST_USER, 
+        '激活账号 - 南开大学统计与数据科学学院研究生推免报名系统',
+        mail_content,
+        settings.EMAIL_HOST_USER,
         [user.email]
     )
-    
+
+
 def send_mail_with_attach():
     pass
 
-#------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 #   自定义Validator
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def IDValidator(value):
-    #身份证号码验证
+    # 身份证号码验证
     Wi = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2]
     Ti = ['1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2']
     sum = 0
-    #身份证第十八位可能是X，输入时将小写x转换为大写X
+    # 身份证第十八位可能是X，输入时将小写x转换为大写X
     value = value.upper()
     if len(value) != 18:
-         raise ValidationError('请输入18位身份证号码,您只输入了%s位' % len(value))
+        raise ValidationError('请输入18位身份证号码,您只输入了%s位' % len(value))
     for i in range(17):
         sum += int(value[i]) * Wi[i]
     if Ti[sum % 11] != value[17]:
         raise ValidationError('请输入正确的身份证号码')
 
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #   全局配置 & JSON & Cache
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime.datetime):
@@ -86,7 +91,7 @@ class GlobalVar(object):
         cache = cache
 
     @staticmethod
-    def decode(d:dict):
+    def decode(d: dict):
         if 'deadline' in d.keys():
             d['deadline'] = datetime.datetime.strptime(
                 d['deadline'], "%Y-%m-%d %H:%M:%S.%f%z")
@@ -102,7 +107,7 @@ class GlobalVar(object):
         except Exception as e:
             logger.warning(e.__str__())
         return d
-    
+
     @staticmethod
     def get():
         try:
@@ -114,7 +119,7 @@ class GlobalVar(object):
         except Exception as e:
             logger.warning(e.__str__())
             return GlobalVar.get_from_file()
-    
+
     @staticmethod
     def set(d):
         try:
@@ -130,14 +135,14 @@ class GlobalVar(object):
                     json.dump(d, f, cls=DateTimeEncoder)
                     fcntl.flock(f.fileno(), fcntl.LOCK_UN)  # 解锁
                 except ImportError:
-                    json.dump(d, f, cls=DateTimeEncoder) # 如果没有fcntl可能会脏读
+                    json.dump(d, f, cls=DateTimeEncoder)  # 如果没有fcntl可能会脏读
             else:
                 json.dump(d, f, cls=DateTimeEncoder)
 
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #   简历验证相关
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def get_university():
     result = finders.find('ChinaUniversityList.json')
     file = open(result, 'r', encoding='utf-8')
@@ -148,7 +153,9 @@ def get_university():
         school.append((i['province'], local_school))
     return school
 
+
 UNIVERSITY = get_university()
+
 
 def check_resume(resume):
     """
@@ -161,8 +168,9 @@ def check_resume(resume):
             (lambda x: x.major_student_amount == 0, '为0'),
             (lambda x: x.major_student_amount < x.rank, '小于个人排名')
         ],
-        'gpa': [(lambda x: x.gpa>100, '大于100')]
-        'cet6_score': [(lambda x: x.cet6_score > 710, '大于710')]
+        'gpa': [(lambda x: x.gpa > 100, '大于100')],
+        'cet6_score': [(lambda x: x.cet6_score > 710, '大于710'),
+                       (lambda x: x.cet6_score < 220, '小于220')]
     }
     for f in resume._meta.fields:
         if f.name in validator.keys():
@@ -170,7 +178,7 @@ def check_resume(resume):
                 try:
                     if v[0](resume):
                         errors.append(
-                            {'name': f.verbose_name, 'msg': '不能'+v[1]})
+                            {'name': f.verbose_name, 'msg': '不能' + v[1]})
                         break
                 except:
                     errors.append(
@@ -191,4 +199,3 @@ def check_disable_or_not(resume):
         return True, '截止提交时间已过'
     else:
         return False, ''
-    

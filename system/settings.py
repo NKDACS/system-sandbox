@@ -26,7 +26,7 @@ SECRET_KEY = secret.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 PRODUCTION_URL_PREFIX = '/tuimian'
-DEBUG = True
+DEBUG = secret.DEBUG
 ALLOWED_HOSTS = ['*']
 
 
@@ -209,4 +209,3 @@ if DEBUG:
     CACHE_MIDDLEWARE_ALIAS = 'dummy'
 else:
     CACHE_MIDDLEWARE_ALIAS = 'default'
-    

@@ -6,10 +6,10 @@
 <div class="container d-flex justify-content-between" style="margin:3rem;">
     <div class="col-md-6">
     <form method="post">{% csrf_token %}
-        <p>您确定要删除 公告"#{{anounce.id}}"吗?</p>
-        <p>标题： {{anounce.title}}?</p>
-        <p>发布时间： {{anounce.public_time | date:'Y-m-d H:i:s' }} </p>
-        <p>编辑时间： {{anounce.last_edit_timestamp | date:'Y-m-d H:i:s' }} </p>
+        <p>您确定要删除 公告"#{{announce.id}}"吗?</p>
+        <p>标题： {{announce.title}}?</p>
+        <p>发布时间： {{announce.public_time | date:'Y-m-d H:i:s' }} </p>
+        <p>编辑时间： {{announce.last_edit_timestamp | date:'Y-m-d H:i:s' }} </p>
         <input type="submit" value="Confirm">
     </form>
     </div>

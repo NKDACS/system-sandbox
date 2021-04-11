@@ -1,5 +1,5 @@
 from django_summernote.fields import SummernoteTextFormField
-from polls.models import MLModel, Resume, Anoucement
+from polls.models import MLModel, Resume, Announcement
 from polls import utils
 from django import forms
 from captcha.fields import CaptchaField
@@ -12,14 +12,16 @@ from django.db.models.functions import Concat
 
 User = get_user_model()
 
+
 class RegisterForm(forms.Form):
     username = forms.CharField(label="用户名", max_length=128, widget=forms.TextInput(attrs={'class': 'form-control'}))
     password1 = forms.CharField(label="密码", max_length=256, widget=forms.PasswordInput(attrs={'class': 'form-control'}))
-    password2 = forms.CharField(label="确认密码", max_length=256, widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    password2 = forms.CharField(label="确认密码", max_length=256,
+                                widget=forms.PasswordInput(attrs={'class': 'form-control'}))
     first_name = forms.CharField(label='名字', max_length=32, widget=forms.TextInput(attrs={'class': 'form-control'}))
     last_name = forms.CharField(label='姓氏', max_length=32, widget=forms.TextInput(attrs={'class': 'form-control'}))
     person_id = forms.CharField(
-        label='身份证号', max_length=18, 
+        label='身份证号', max_length=18,
         validators=[utils.IDValidator],
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
@@ -63,10 +65,11 @@ class UserProfileForm(forms.Form):
 class ResumeForm(forms.ModelForm):
     class Meta:
         model = Resume
-        fields = [ 
-            'university', 'school', 'major', 'gpa','rank', 
-            'major_student_amount',
-            'cet6', 'other_prize_penalty', 'others', 'enrollment_type','enrollment_major','enrollment_tutor'
+        fields = [
+            'university', 'school', 'major', 'gpa', 'rank',
+            'major_student_amount', 'cet6', 'cet6_score',
+            'other_prize_penalty', 'others', 'enrollment_type',
+            'enrollment_major', 'enrollment_tutor'
         ]
         widgets = {
             'university': forms.Select(attrs={'class': 'form-control'}),
@@ -74,21 +77,20 @@ class ResumeForm(forms.ModelForm):
             'major': forms.TextInput(attrs={'class': 'form-control'}),
             'gpa': forms.NumberInput(attrs={'class': 'form-control'}),
             'rank': forms.NumberInput(attrs={'class': 'form-control'}),
-            'major_student_amout': forms.NumberInput(attrs={'class': 'form-control'}),
+            'major_student_amount': forms.NumberInput(attrs={'class': 'form-control'}),
             'cet6': forms.CheckboxInput(attrs={'class': 'form-check-input', 'style': 'margin-left:1rem;'}),
-            #'cet6_score': forms.NumberInput(attrs={'class': 'form-control'}),
-            'other_prize_penalty': forms.Textarea(attrs={'class': 'form-control', 'rows': '3', 'maxlength':'1000'}),
+            'cet6_score': forms.NumberInput(attrs={'class': 'form-control'}),
+            'other_prize_penalty': forms.Textarea(attrs={'class': 'form-control', 'rows': '3', 'maxlength': '1000'}),
             'others': forms.Textarea(attrs={'class': 'form-control', 'rows': '3', 'maxlength': '1000'}),
             'enrollment_type': forms.Select(attrs={'class': 'form-control', 'style': 'width:30%'}),
-            'enrollment_major': forms.Select(attrs={'class': 'form-control', 'style': 'width:30%'}),
             'enrollment_major': forms.Select(attrs={'class': 'form-control', 'style': 'width:30%'}),
             'enrollment_tutor': forms.TextInput(attrs={'class': 'form-control', 'style': 'width:50%'}),
         }
 
 
-class AnouncementForm(forms.ModelForm):
+class AnnouncementForm(forms.ModelForm):
     class Meta:
-        model = Anoucement
+        model = Announcement
         fields = ['title', 'content', 'public_time']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
@@ -118,7 +120,7 @@ class GlobalVarForm(forms.Form):
 
 class SendMultiMailForm(forms.Form):
     title = forms.CharField(
-        label='邮件标题', max_length=32, 
+        label='邮件标题', max_length=32,
         required=True, initial='通知 - 南开大学统计与数据科学学院推免报名系统',
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
@@ -136,7 +138,7 @@ class SendMultiMailForm(forms.Form):
         super().__init__(*args, **kwargs)
         q = choices = User.objects.annotate(
             label=Concat('last_name', 'first_name', V('('), 'person_id', V(')'),
-            output_field=CharField())
+                         output_field=CharField())
         ).values('id', 'label')
         self.fields['to'] = forms.MultipleChoiceField(
             label='收件人',
@@ -147,7 +149,7 @@ class SendMultiMailForm(forms.Form):
 
 
 class SelectModelForm(forms.Form):
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['model'] = forms.ChoiceField(
@@ -158,4 +160,3 @@ class SelectModelForm(forms.Form):
             widget=forms.Select(),
             required=True
         )
-

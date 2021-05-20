@@ -121,7 +121,7 @@ class GlobalVarForm(forms.Form):
 class SendMultiMailForm(forms.Form):
     title = forms.CharField(
         label='邮件标题', max_length=32,
-        required=True, initial='通知 - 南开大学统计与数据科学学院推免报名系统',
+        required=True, initial='通知 - 推免报名系统',
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     content = SummernoteTextFormField(

@@ -40,7 +40,7 @@ def send_activate_email(request, user):
         'token': account_activation_token.make_token(user),
     })
     send_mail(
-        '激活账号 - 南开大学统计与数据科学学院研究生推免报名系统',
+        '激活账号 - 研究生推免报名系统',
         mail_content,
         settings.EMAIL_HOST_USER,
         [user.email]
